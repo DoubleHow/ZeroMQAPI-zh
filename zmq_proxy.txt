@@ -1,0 +1,67 @@
+zmq_proxy(3)             ØMQ Manual - ØMQ/4.1.0
+
+Name
+
+zmq_proxy – 开始ZMQ内置代理
+
+Synopsis
+
+int zmq_proxy (const void *frontend, const void *backend, const void *capture);
+Description
+
+zmq_proxy()函数在当前线程内开始ZMQ内置代理。
+
+代理将一个前端socket连接到一个后端。一般来说，数据会从前端流向后端。根据socket的类型，数据可能向相反的方向流动。方向指示概念上的；代理是完全对称的，在技术上前端和后端没有什么区别。
+
+在调用zmq_proxy()函数之前，你最好把该设置的socket属性都设置了，并且前端和后端都要进行连接或绑定。这两个传统的代理模式是：
+
+zmq_proxy()函数在当前的线程空间中运行，并且只有在当前使用的context被关闭之后才会返回。
+
+如果捕捉到的socket不是NULL，代理会发送从前端和后端接收到的所有消息给捕捉到的socket。获取的socket的类型应该是ZMQ_PUB、ZMQ_DEALER、ZMQ_PUSH、ZMQ_PAIR。
+
+参见zmq_socket(3)函数获取socket类型更详细的说明。
+
+Example  usage
+
+　　共享队列
+
+　　当前端是一个ZMQ_ROUTER类型的socket，并且后端是一个ZMQ_DEALER类型的scoket的时候，代理会扮演一个共享队列的角色，从许多的客户端接收消息，并且把这些消息公平的分发到服务端。这些请求会被前端公平的放置在队列里进行接收，并通过后端进行均衡的分发。回复会自动的返回给原始的请求者。
+
+　　Forwarder
+
+　　当前端是一个ZMQ_XSUB类型的socket，并且后端是ZMQ_XPUB类型的socket的时候，代理会扮演一个运送者的角色。从大量的分发者中手机消息，并把这消息发送给一批订阅者。这可以被用于桥接传输模式。更多信息请参见tcp://和pgm://。
+
+　　Streamer
+
+　　当前端是ZMQ_PULL类型的socket，后端是ZMQ_PUSH类型的消息时，代理会从一批客户端手机消息并发送给一批使用管道传输模式的工作端。
+
+Return value
+
+zmq_proxy()函数只会返回 -1，并且设置errno的值为ETERM（ZMQ context被关闭了或者任何一个给定的socket被关闭了）。
+
+Example
+
+　　创建一个共享队列代理
+//  Create frontend and backend sockets
+void *frontend = zmq_socket (context, ZMQ_ROUTER);
+assert (backend);
+void *backend = zmq_socket (context, ZMQ_DEALER);
+assert (frontend);
+//  Bind both sockets to TCP ports
+assert (zmq_bind (frontend, "tcp://*:5555") == 0);
+assert (zmq_bind (backend, "tcp://*:5556") == 0);
+//  Start the queue proxy, which runs until ETERM 
+zmq_proxy (frontend, backend, NULL);
+
+
+See also
+
+zmq_bind(3)  zmq_connect(3)  zmq_socket(3)  zmq(7)
+
+Authors
+
+This page was written by the ØMQ community. To make a change please read the ØMQ Contribution Policy at http://www.zeromq.org/docs:contributing.
+
+Web site design and content is copyright (c) 2007-2012 iMatix Corporation. Contact us for professional support. Site content licensed under the Creative Commons Attribution-Share Alike 3.0 License. ØMQ is copyright (c) Copyright (c) 2007-2012 iMatix Corporation and Contributors. ØMQ is free software licensed under the LGPL. ØMQ, ZeroMQ, and 0MQ are trademarks of iMatix Corporation. Terms of Use — Privacy
+
+Policy
