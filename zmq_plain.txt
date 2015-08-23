@@ -1,0 +1,25 @@
+zmq_plain(7) 　　　　ØMQ Manual - ØMQ/4.1.0
+
+Name
+
+zmq_plain - 明文认证
+
+Synopsis
+
+PLAIN机制定义了一种简单的用户/密码机制来使服务器认证客户端。PLAIN机制并不试图保证安全和可信。PLAIN机制的目的是用在对安全要求较低的内部网中。PLAIN机制在RFC文档 http://rfc.zeromq.org/spec:24 中进行了说明。
+
+Usage
+
+要是有PLAIN机制，需要在服务端的socket设置ZMQ_PLAIN_SERVER属性，并且在客户端的socket设置ZMQ_PLAIN_USERNAME属性和ZMQ_PLAIN_PASSWORD属性。至于是那一端进行的绑定，那一端进行的连接请求并不影响。
+
+See also
+
+zmq_setsockopt(3)  zmq_null(7)  mq_curve(7)  zmq(7)
+
+Authors
+
+This page was written by the ØMQ community. To make a change please read the ØMQ Contribution Policy at http://www.zeromq.org/docs:contributing.
+
+Web site design and content is copyright (c) 2007-2012 iMatix Corporation. Contact us for professional support. Site content licensed under the Creative Commons Attribution-Share Alike 3.0 License. ØMQ is copyright (c) Copyright (c) 2007-2012 iMatix Corporation and Contributors. ØMQ is free software licensed under the LGPL. ØMQ, ZeroMQ, and 0MQ are trademarks of iMatix Corporation. Terms of Use — Privacy
+
+Policy
