@@ -1,0 +1,96 @@
+zmq_msg_send(3) 　　　　ØMQ Manual - ØMQ/3.2.5
+
+Name
+
+zmq_msg_send – 从一个socket发送一个消息帧
+
+Synopsis
+
+int zmq_msg_send (zmq_msg_t *msg, void *socket, int flags);
+Description
+
+zmq_msg_send函数和zmq_sendmsg(3)函数是完全相同的，只是zmq_sendmsg(3)在以后的版本中会被弃用。zmq_msg_send()函数在操作性方面和其他消息函数更有一致性。
+
+zmq_msg_send()函数将会使用socket指定的socket，以队列方式（FIFO）将msg参数指定的消息添加到发送队列里面。flags参数由下列标志组合（|）而成：
+
+　　ZMQ_DONTWAIT
+
+　　　　指明本次操作使用非阻塞方式执行。如果这个消息不能被添加到哦消息队列里面，zmq_msg_send()函数会执行失败，并设置errno的值为EAGAIN.。
+
+　　ZMQ_SNDMORE
+
+　　　　指明正在被发送的消息是个多帧消息，并且后面还有更多的消息会进行发送。参见下面关于多帧消息的章节，以获取更详细的信息。
+
+在调用zmq_msg_send()函数的时候，消息结构zmq_msg_t是失效的。如果想把消息发送给多个socket，需要调用复制函先数复制这个消息（比如zmq_msg_copy()函数）。
+
+注意：调用zmq_msg_send()成功并不意味着消息已经成功得发送到网络上了，只能说明消息已经添加到消息队列，ZMQ会确保消息的发送。
+
+多帧消息（Multi-part messages 具体怎么翻译我也不会。。。）
+
+一个ZMQ消息是由1个或多个帧组成的。每个消息段都是一个对立的zmq_msg_t消息结构。ZMQ确保对消息进行原子交付：每个socket或者接收整个消息，或者一个消息帧也不接收。每个消息中的帧数是不受限制的，除非内存不够用了。
+
+除了发送最后一帧消息，应用进程每次发送消息时必须使用ZMQ_SNDMORE标志以发送多帧消息。
+
+Return value
+
+如果zmq_msg_send()函数执行成功则返回消息中数据的长度。否则返回 -1，并且设置errno的值为下列值。
+
+Errors
+
+　　EAGAIN
+
+　　　　在使用非阻塞模式发送消息的时候此消息不可用。
+
+　　ENOTSUP
+
+　　　　zmq_msg_send()函数不支持此socket的类型。
+
+　　EFSM
+
+　　　　当socket处在不正确的状态时，zmq_msg_send()操作无法执行。这中情况可能发生在一个socket在集中状态间切换的时候，比如ZMQ_REP。请查看zmq_socket(3) 函数的消息模式章节获得更多信息。
+
+　　ETERM
+
+　　　　和socket相联系的ZMQ context被终结了。
+
+　　ENOTSOCK
+
+　　　　参数提供的socket不可用。
+
+　　EINTR
+
+　　　　在消息发送之前，操作被系统信号中断了。
+
+　　EFAULT
+
+　　　　参数提供的消息不可用。
+
+Example
+
+　　向一个消息对象写入内容并发送
+/* Create a new message, allocating 6 bytes for message content */
+zmq_msg_t msg;
+int rc = zmq_msg_init_size (&msg, 6);
+assert (rc == 0);
+/* Fill in message content with 'AAAAAA' */
+memset (zmq_msg_data (&msg), 'A', 6);
+/* Send the message to the socket */
+rc = zmq_msg_send (&msg, socket, 0); assert (rc == 6);
+
+
+　　发送一个多帧消息
+/* Send a multi-part message consisting of three parts to socket */
+rc = zmq_msg_send (&part1, socket, ZMQ_SNDMORE);
+rc = zmq_msg_send (&part2, socket, ZMQ_SNDMORE);
+/* Final part; no more parts to follow */ rc = zmq_msg_send (&part3, socket, 0);
+See also
+
+zmq_recv(3) zmq_send(3) zmq_msg_recv(3) zmq_socket(7) zmq(7)
+
+Authors
+
+This ØMQ manual page was written by Martin Sustrik <sustrik@250bpm.com> and Martin Lucina <mato@kotelna.sk>, and Pieter Hintjens <ph@imatix.com>.
+
+Web site design and content is copyright (c) 2007-2012 iMatix Corporation. Contact us for professional support. Site content licensed under the Creative Commons Attribution-Share Alike 3.0 License. ØMQ is copyright (c) Copyright (c) 2007-2012 iMatix Corporation and Contributors. ØMQ is free software licensed under the LGPL. ØMQ, ZeroMQ, and 0MQ are trademarks of iMatix Corporation. Terms of Use — Privacy
+
+Policy
