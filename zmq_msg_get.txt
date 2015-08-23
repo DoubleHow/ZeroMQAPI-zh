@@ -1,0 +1,62 @@
+zmq_msg_get(3) 　　　　 ØMQ Manual - ØMQ/3.2.5
+
+Name
+
+zmq_msg_get - 获取消息的性质
+
+Synopsis
+
+int zmq_msg_get (zmq_msg_t *message, int property);
+Description
+
+zmq_msg_get()函数会返回message参数指定的消息的属性值，属性由property参数指定。
+
+以下的属性可以由zmq_msg_get() 函数获取。
+
+　　ZMQ_MORE
+
+　　　　这个参数指出在这个message之后是否还有更多的消息帧。
+
+Return value
+
+zmq_msg_get()函数如果执行成功则返回消息的属性值。否则函数返回 -1，并且设置errno为下列指定的值。
+
+Errors
+
+　　EINVAL
+
+　　　　请求的属性未知。
+
+Example
+
+　　接收一个多帧的消息。
+
+while (true) 
+{
+    //  Create an empty ØMQ message to hold the message fram
+    int rc = zmq_msg_init (&frame);
+    assert (rc == 0);
+    //  Block until a message is available to be received from socket
+    rc = zmq_recvmsg (socket, &frame, 0);
+    assert (rc != -1);
+    if (zmq_msg_get (&frame, ZMQ_MORE))
+        fprintf (stderr, "more\n");
+    else 
+    {
+        fprintf (stderr, "end\n");
+        break;
+    }
+    zmq_msg_close (frame); 
+}
+
+See also
+
+zmq_msg_set(3)  zmq_msg_init(3)  zmq_msg_close(3)  zmq(7)
+
+Authors
+
+This ØMQ manual page was written by Chuck Remes <cremes@mac.com> and Pieter Hintjens <ph@imatix.com>.
+
+Web site design and content is copyright (c) 2007-2012 iMatix Corporation. Contact us for professional support. Site content licensed under the Creative Commons Attribution-Share Alike 3.0 License. ØMQ is copyright (c) Copyright (c) 2007-2012 iMatix Corporation and Contributors. ØMQ is free software licensed under the LGPL. ØMQ, ZeroMQ, and 0MQ are trademarks of iMatix Corporation. Terms of Use — Privacy
+
+Policy
