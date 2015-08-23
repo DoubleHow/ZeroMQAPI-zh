@@ -1,0 +1,46 @@
+zmq_msg_init(3) 　　　　ØMQ Manual - ØMQ/3.2.5
+
+Name
+
+zmq_msg_init - 初始化一个空的ZMQ消息结构
+
+Synopsis
+
+int zmq_msg_init (zmq_msg_t *msg);
+Description
+
+zmq_msg_init()函数会将msg参数引用的ZMQ消息对象进行初始化，使其成为一个空消息。在使用zmq_recv()函数接收消息之前调用此函数是很有必要的。
+
+永远不要直接对zmq_msg_t对象进行直接操作，而是要使用zmq_msg函数族进行操作。
+
+zmq_msg_init()、zmq_msg_init_data()和zmq_msg_init_size()这三个函数是互斥的。永远不要把一个zmq_msg_t对象初始化两次。
+
+Return value
+
+函数zmq_msg_init()执行成功返回0。否则返回 -1，并且设置errno的值为下列定义的值。
+
+Errors
+
+　　没有定义错误信息。
+
+Example
+
+　　从一个socket接收消息。
+
+1 zmq_msg_t msg;
+2 rc = zmq_msg_init (&msg);
+3 assert (rc == 0);
+4 rc = zmq_recv (socket, &msg, 0); assert (rc == 0);
+See also
+
+zmq_msg_init_size(3)  zmq_msg_init_data(3)  zmq_msg_close(3)  zmq_msg_data(3)  zmq_msg_size(3)  zmq(7)
+
+Authors
+
+This ØMQ manual page was written by Martin Sustrik <sustrik@250bpm.com> and Martin Lucina
+
+<mato@kotelna.sk>.
+
+Web site design and content is copyright (c) 2007-2012 iMatix Corporation. Contact us for professional support. Site content licensed under the Creative Commons Attribution-Share Alike 3.0 License. ØMQ is copyright (c) Copyright (c) 2007-2012 iMatix Corporation and Contributors. ØMQ is free software licensed under the LGPL. ØMQ, ZeroMQ, and 0MQ are trademarks of iMatix Corporation. Terms of Use — Privacy
+
+Policy
