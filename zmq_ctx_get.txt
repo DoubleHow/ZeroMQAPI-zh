@@ -1,0 +1,51 @@
+zmq_ctx_get(3)  　　　　ØMQ Manual - ØMQ/3.2.5
+
+Name
+
+zmq_ctx_get - 得到环境上下文的属性
+
+Synopsis
+
+int zmq_ctx_get (void *context, int option_name);
+Description
+
+zmq_ctx_get()函数会返回被参数option_name指定的属性值。
+
+zmq_ctx_get()接收以下的属性名：
+
+　　ZMQ_IO_THREADS ：获取I/O线程的数目
+
+　　ZMQ_IO_THREADS参数会返回这个context的ZMQ线程池的大小 
+
+　　ZMQ_MAX_SOCKETS ：获取socket数量的最大值
+
+　　ZMQ_MAX_SOCKETS参数返回这个context允许创建socket数量的最大值
+
+Return value
+
+zmq_ctx_get()函数返回0，执行成功了则返回一个正数。其它情况则返回 -1，并且设置errno为下列值。
+
+Errors
+
+EINVAL
+
+　　请求的属性名option_name未知。
+
+Example
+
+给socket数量设置一个最大值。
+
+1 void *context = zmq_ctx_new ();
+2 zmq_ctx_get (context, ZMQ_MAX_SOCKETS, 256);
+3 int max_sockets = zmq_ctx_get (context, ZMQ_MAX_SOCKETS); assert (max_sockets == 256);
+See also
+
+zmq_ctx_set(3)  zmq(7)
+
+Authors
+
+This ØMQ manual page was written by Pieter Hintjens <ph@imatix.com>
+
+Web site design and content is copyright (c) 2007-2012 iMatix Corporation. Contact us for professional support. Site content licensed under the Creative Commons Attribution-Share Alike 3.0 License. ØMQ is copyright (c) Copyright (c) 2007-2012 iMatix Corporation and Contributors. ØMQ is free software licensed under the LGPL. ØMQ, ZeroMQ, and 0MQ are trademarks of iMatix Corporation. Terms of Use — Privacy
+
+Policy
