@@ -1,0 +1,53 @@
+zmq_inproc(7)   ØMQ Manual - ØMQ/4.2.0
+
+Name
+
+zmq_inproc – ØMQ 本地进程内（线程间）传输方式
+
+Synopsis
+
+进程内传输方式意味着在共享ZMQ context的线程间通过内存方式传输数据。
+在使用inproc方式进行传输时，不需要使用I/O线程。所以呢，如果你使用ZMQ context进行进程内消息传送，你可以初始化这个context的I/O线程为0。参见zmq_init(3)获得更多细节。
+Addressing
+
+一个ZMQ终结点包括transport://跟着一个address（例如：inproc://someaddress）。Transport指明了要使用的底层协议。address指明了要连接的传输地址。
+
+对于进程内传输，传输方式是inproc，address的含义在下面进行定义。
+
+　　为一个socket分配一个地址
+
+当使用zmq_bind()函数给一个socket分配一个本地地址的时候，终结点必须是一个任意的唯一字符串，用来创建一个文件。这个文件名必须是在与这个socket关联的ZMQ context上是唯一的，而且长度不能大于256字节。对于这个文件名的格式没有任何限制。
+
+　　连接一个socket
+
+当使用zmq_connect()函数连接一个使用inproc传输方式的socket端时，终结点必须是一个唯一表示一个文件名的字符串，作为用来连接的文件名。这个文件名在被连接时，必须保证已经被相同context上的一个socket创建了。
+
+Examples
+
+　　给一个socket分配一个本地地址
+
+//  Assign the in-process name "#1"
+rc = zmq_bind(socket, "inproc://#1");
+assert (rc == 0);
+//  Assign the in-process name "my-endpoint"
+rc = zmq_bind(socket, "inproc://my-endpoint");
+assert (rc == 0);
+　　连接一个socket
+
+//  Connect to the in-process name "#1"
+rc = zmq_connect(socket, "inproc://#1");
+assert (rc == 0);
+//  Connect to the in-process name "my-endpoint"
+rc = zmq_connect(socket, "inproc://my-endpoint");
+assert (rc == 0);
+See also
+
+zmq_bind(3)  zmq_connect(3)  zmq_ipc(7)  zmq_tcp(7)  zmq_pgm(7)  zmq(7)
+
+Authors
+
+This ØMQ manual page was written by Pieter Hintjens <ph@imatix.com>, Martin Sustrik <sustrik@250bpm.com> and Martin Lucina <mato@kotelna.sk>.
+
+Web site design and content is copyright (c) 2007-2012 iMatix Corporation. Contact us for professional support. Site content licensed under the Creative Commons Attribution-Share Alike 3.0 License. ØMQ is copyright (c) Copyright (c) 2007-2012 iMatix Corporation and Contributors. ØMQ is free software licensed under the LGPL. ØMQ, ZeroMQ, and 0MQ are trademarks of iMatix Corporation. Terms of Use — Privacy
+
+Policy
