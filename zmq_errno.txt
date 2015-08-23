@@ -1,0 +1,38 @@
+zmq_errno(3)         ØMQ Manual - ØMQ/3.2.5
+
+Name
+
+zmq_errno – 返回errno的值给调用此函数的线程
+
+Synopsis
+
+int zmq_errno (void);
+Description
+
+函数zmq_errno() 会返回errno变量的值给调用此函数的线程。
+
+zmq_errno() 函数时为了帮助使用非POSIX系统的用户直接地获取当前errno的值来解决问题的。尤其对于使用特殊C运行时链接库的Win32用户，当ZMQ使用这些库的时候需要使用zmq_errno() 来进行当前的操作。
+
+不需要取回errno当前值的用户不应该使用这个函数，而是应该直接对errno的值进行操作。
+
+Return value
+
+zmq_errno()函数会返回errno的当前值给调用此函数的线程。
+
+Errors
+
+　　没有定义任何错误代码。
+
+See also
+
+zmq(7)
+
+Authors
+
+This ØMQ manual page was written by Martin Sustrik <sustrik@250bpm.com> and Martin Lucina <mato@kotelna.sk>.
+
+ 
+
+Web site design and content is copyright (c) 2007-2012 iMatix Corporation. Contact us for professional support. Site content licensed under the Creative Commons Attribution-Share Alike 3.0 License. ØMQ is copyright (c) Copyright (c) 2007-2012 iMatix Corporation and Contributors. ØMQ is free software licensed under the LGPL. ØMQ, ZeroMQ, and 0MQ are trademarks of iMatix Corporation. Terms of Use — Privacy
+
+Policy
