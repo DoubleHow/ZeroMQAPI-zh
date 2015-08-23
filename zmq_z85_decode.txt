@@ -1,0 +1,36 @@
+zmq_z85_decode(3)         ØMQ Manual - ØMQ/4.1.0
+
+Name
+
+zmq_z85_decode – 从一个用Z85算法生成的文本中解析出二进制密码
+
+Synopsis
+
+uint8_t *zmq_z85_decode (uint8_t *dest, char *string);
+Description
+
+zmq_z85_decode()函数将解密string参数指定的加密文本到dest指定的存储空间。string的长度必须是能被5整除的数。dest参数指定的存储空间必须足够大以满足（strlen(string) * 0.8）。
+
+解密方式遵循ZMQ RFC 32文档的规则。
+
+Return value
+
+如果zmq_z85_decode()函数执行成功则会返回dest的地址，否则返回NULL。
+
+Example
+
+　　解密一个curve密码
+
+1 char decoded [] = "rq:rM>}U?@Lns47E1%kR.o@n%FcmmsL/@{H8]yf7";
+2 uint8_t public_key [32]; zmq_z85_decode (public_key, decoded);
+See also
+
+zmq_z85_decode(3)  zmq_curve_keypair(3)  zmq_curve(7)
+
+Authors
+
+This page was written by the ØMQ community. To make a change please read the ØMQ Contribution Policy at http://www.zeromq.org/docs:contributing.
+
+Web site design and content is copyright (c) 2007-2012 iMatix Corporation. Contact us for professional support. Site content licensed under the Creative Commons Attribution-Share Alike 3.0 License. ØMQ is copyright (c) Copyright (c) 2007-2012 iMatix Corporation and Contributors. ØMQ is free software licensed under the LGPL. ØMQ, ZeroMQ, and 0MQ are trademarks of iMatix Corporation. Terms of Use — Privacy
+
+Policy
