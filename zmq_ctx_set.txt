@@ -1,0 +1,57 @@
+zmq_ctx_set(3) ØMQ Manual - ØMQ/3.2.5
+
+Name
+
+zmq_ctx_set - 设置环境上下文属性
+
+Synopsis
+
+int zmq_ctx_set (void *context, int option_name, int option_value);
+Description
+
+函数 zmq_ctx_set() 将参数option_name指定的属性设置为参数option_value 的值。
+
+zmq_ctx_set() 函数可以设置下列的参数：
+
+ZMQ_IO_THREADS：设置I/O线程的个数
+
+ZMQ_IO_THREADS参数用来指定ZMQ 线程池的大小，来对I/O进行操作。
+
+如果你的应用程序只是使用inproc方式进行传输，你可以把这个值设置为0，否则你至少要设置成1。这个属性必须在向这个context上创建socket之前进行设置。
+
+　　　　默认值 　　1
+
+ZMQ_MAX_SOCKETS：设置socket数量的最大值
+
+ZMQ_MAX_SOCKETS参数设置允许在这个context上创建socket数量的最大值。
+
+　　　　默认值　　1024
+
+Return value
+
+执行成功时，zmq_ctx_set() 函数返回0。否则函数返回 -1，并且设置errno为下列定义的值。
+
+Errors
+
+　　EINVAL
+
+　　　　参数给定的属性option_name未知。
+
+Example
+
+　　给socket设置最大值。
+
+1 void *context = zmq_ctx_new ();
+2 zmq_ctx_set (context, ZMQ_MAX_SOCKETS, 256);
+3 int max_sockets = zmq_ctx_get (context, ZMQ_MAX_SOCKETS); assert (max_sockets == 256);
+See also
+
+zmq_ctx_get(3)  zmq(7)
+
+Authors
+
+This ØMQ manual page was written by Pieter Hintjens <ph@imatix.com>
+
+Web site design and content is copyright (c) 2007-2012 iMatix Corporation. Contact us for professional support. Site content licensed under the Creative Commons Attribution-Share Alike 3.0 License. ØMQ is copyright (c) Copyright (c) 2007-2012 iMatix Corporation and Contributors. ØMQ is free software licensed under the LGPL. ØMQ, ZeroMQ, and 0MQ are trademarks of iMatix Corporation. Terms of Use — Privacy
+
+Policy
