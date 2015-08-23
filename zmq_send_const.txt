@@ -1,0 +1,87 @@
+zmq_send_const(3)           ØMQ Manual - ØMQ/4.1.0
+
+Name
+
+zmq_send_const – 从一个socket上发送一个固定内存数据
+
+Synopsis
+
+int zmq_send_const (void *socket, void *buf, size_t len, int flags);
+Description
+
+zmq_send_const()函数会将通过buf参数和len参数创建的消息添加到socket的消息队列中。消息内存被认为是一个固定的空间，并且不会以任何方式被复制或者被释放。flags参数是下面定义的标志的组合：
+
+　　ZMQ_DONTWAIT
+
+当一些socket类型（DEALER、PUSH）由于对端不可用（或者所有的对端都到达高水位线），此选项指定本次的操作以非阻塞方式执行。如果无法添加到socket的消息队列中，zmq_send_const()函数会执行错误，并设置errno的值为EAGAIN。
+
+　　ZMQ_SNDMORE
+
+指明当前发送的消息是个多帧消息，并且还会有次消息的更多帧要发送。参见下面对多消息的描述章节，以获取更多信息。
+
+成功的调用zmq_send_const()函数并不能说明消息已经被发送到网络上，而是消息已经被添加到了消息队列上，并且ZMQ将对这个消息负责。
+Multi-part messages
+
+一个ZMQ消息由一个或多个消息帧组成。ZMQ保证自动交付这个消息：一端会完全接收这个消息，或者完全不接收这个消息。消息的帧的总数没有限制，只要内存够用就行。
+
+应用进程在发送多帧消息的时候，出了发送最后一帧的时候，必须要使用ZMQ_SNDMORE标志。
+
+Return value
+
+如果函数zmq_send_const()执行成功，则返回消息的字节数。否则，函数返回 -1，并且设置errno的值为下列定义的值。
+
+Errors
+
+　　EAGAIN
+
+　　　　非阻塞模式发送时，消息在此刻无法被发送。
+
+　　ENOTSUP
+
+　　　　zmq_send_const()函数不支持此socket的类型。
+
+　　EFSM
+
+　　　　zmq_send_const()操作此刻无法在这个socket上进行操作，因为这个socket此时处在不恰当的状态。这个错误经常发生在一些经常在几种状态间互相转换的socket类型上，比如ZMQ_REP。参见zmq_socket(3)函数的消息模式部分，以获取更多信息。
+
+　　ETERM
+
+　　　　和指定的socket先关联的context被终结了。
+
+　　ENOTSOCK
+
+　　　　参数提供的socket不能使用。
+
+　　EINTR
+
+　　　　在消息发送之前，操作被信号中断了。
+
+　　EHOSTUNREACH
+
+　　　　消息无法被路由。
+
+Example
+
+　　发送一个多帧消息
+/* Send a multi-part message consisting of three parts to socket */
+rc = zmq_send_const (socket, "ABC", 3, ZMQ_SNDMORE);
+assert (rc == 3);
+rc = zmq_send_const (socket, "DEFGH", 5, ZMQ_SNDMORE);
+assert (rc == 5);
+/* Final part; no more parts to follow */
+rc = zmq_send_const (socket, "JK", 2, 0); 
+assert (rc == 2);
+
+See also
+
+zmq_send(3)  zmq_recv(3)  zmq_socket(7)  zmq(7)
+
+Authors
+
+This page was written by the ØMQ community. To make a change please read the ØMQ Contribution Policy at http://www.zeromq.org/docs:contributing.
+
+Web site design and content is copyright (c) 2007-2012 iMatix Corporation. Contact us for professional support. Site content licensed under the Creative Commons Attribution-Share Alike 3.0 License. ØMQ is copyright (c) Copyright (c) 2007-2012 iMatix Corporation and Contributors. ØMQ is free software licensed
+
+under the LGPL. ØMQ, ZeroMQ, and 0MQ are trademarks of iMatix Corporation. Terms of Use — Privacy
+
+Policy
