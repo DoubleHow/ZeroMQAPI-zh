@@ -1,0 +1,91 @@
+zmq_poll(3)   　　ØMQ Manual - ØMQ/4.1.0
+
+Name
+
+zmq_poll - I/O多路技术
+
+Synopsis
+
+int zmq_poll (zmq_pollitem_t *items, int nitems, long timeout);
+Description
+
+zmq_poll()函数为应用程序提供了一种对一组socket进行多路I/O事件水平触发的机制。items参数指向的数组中的每一个元素都是一个zmq_pollitem_t结构体。nitems参数指定了items数组里面的元素个数。zmq_pollitem_t结构的敌营如下所示：
+
+复制代码
+typedef struct
+{
+    void //*socket//;
+    int //fd//;
+    short //events//;
+    short //revents//;
+} zmq_pollitem_t;
+复制代码
+对每一个zmq_pollitem_t项，zmq_poll()函数都会对socket指定的socket或者fd指定的标准socket文件描述符检查其events.参数。如果socket和fd的值都进行了设置，则socket参数指定的ZMQ socket会进行优先检查，fd则会被忽略。
+
+对每一个zmq_pollitem_t项，zmq_poll() 函数会首先清除 revents成员变量，然后为任何发生了改变的事件设置当前事件对应的位来指明哪个事件发生了什么变化。
+
+如果在zmq_pollitem_t项中，没有一个请求事件发生，zmq_poll()函数将会等待timeout毫秒后返回。如果timeout参数的值是0，zmq_poll()函数会立即返回。如果timeout值是 -1，zmq_poll()则会进入无限阻塞等待状态，直到至少一个zmq_pollitem_t项上请求的事件发生了。
+
+zmq_pollitem_t结构中的events和revents成员是由以下标志进行位与和或操作组成的：
+
+　　ZMQ_POLLIN
+
+　　　　对于ZMQ socket来说，至少有一个消息在这个socket上被非阻塞的接收到了。对于标准socket来说，此标志和系统调用的poll()函数的POLLIN标志等价，而且通常意味着，fd文件描述符上至少非阻塞的接收到了1B的数据。
+
+　　ZMQ_POLLOUT
+
+　　　　对于ZMQ socket来说，至少有一个消息使用非阻塞模式发送了。对于标准socket来说，此标志和系统调用poll()函数的POLLOUT标志等价，这通常意味着至少有1B的数据使用非阻塞模式写到了fd文件描述符里面。
+
+　　ZMQ_POLLERR
+
+　　　　对于标准socket来说，这个标志通过zmq_poll()传递给底层的系统调用poll()，通常此标志意味着fd上出现了一些错误。对于ZMQ socket来说，这个标志在events中不会造成影响，而且此标志不会出现在revents中被zmq_poll()返回。
+
+字应用的时候应该优先使用zmq_poll()而不是系统调用poll()。在使用poll()函数的时候有些方法可能会受到本文档中没有定义的限制。
+
+Return value
+
+如果执行成功，zmq_poll()函数会返回被标记了事件的zmq_pollitem_t结构体的数目，如果返回0，说明没有事件发生。如果执行失败，则返回 -1， 并且设置errno的值为下列定义的值。
+
+Errors
+
+　　ETERM
+
+　　　　在items给出的数组中，至少有一个socket相联系的ZMQ context已经被终结了。
+
+　　EFAULT
+
+　　　　items参数不可用（NULL）
+
+　　EINTR
+
+　　　　在任何事件响应之前，这个操作被系统信号中断了。
+
+Example
+
+　　阻塞方式响应ZMQ socket和标准系统socket
+zmq_pollitem_t items [2];
+/* First item refers to ØMQ socket 'socket' */
+items[0].socket = socket;
+items[0].events = ZMQ_POLLIN;
+/* Second item refers to standard socket 'fd' */
+items[1].socket = NULL;
+items[1].fd = fd;
+items[1].events = ZMQ_POLLIN;
+/* Poll for events indefinitely */
+int rc = zmq_poll (items, 2, -1);
+assert (rc >= 0); /* Returned events will be stored in items[].revents */
+
+
+See also
+
+zmq_socket(3) zmq_send(3) zmq_recv(3) zmq(7)
+
+你操作系统中对poll()系统调用的文档。
+
+Authors
+
+This page was written by the ØMQ community. To make a change please read the ØMQ Contribution Policy at http://www.zeromq.org/docs:contributing.
+
+Web site design and content is copyright (c) 2007-2012 iMatix Corporation. Contact us for professional support. Site content licensed under the Creative Commons Attribution-Share Alike 3.0 License. ØMQ is copyright (c) Copyright (c) 2007-2012 iMatix Corporation and Contributors. ØMQ is free software licensed under the LGPL. ØMQ, ZeroMQ, and 0MQ are trademarks of iMatix Corporation. Terms of Use — Privacy
+
+Policy
