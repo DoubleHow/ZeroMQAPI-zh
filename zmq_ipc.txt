@@ -1,0 +1,52 @@
+zmq_ipc(7)          ØMQ Manual - ØMQ/3.2.5
+
+Name
+
+zmq_ipc – ZMQ本地进程间通信传输协议
+
+Synopsis
+
+进程间传输采用与系统相关的IPC机制进行本地进程间的消息通信。
+
+进程间传输方式目前只在提供UNIX定义的socket系统上完全的实现了。
+
+Addressing
+
+一个终结点包括transport://跟着一个address （对于IPC也就是 ipc://address）。transport指定了要使用的底层的系统协议。address指定了需要连接的指定地址。
+
+对于进程间的传输，transport指的是ipc，address部分在下面进行定义。
+
+绑定一个socket
+
+当使用zmq_bind()函数以ipc传输方式绑定一个本地socket的时候，终结点应该是一个任意字符串的文件名，能够唯一标志将要创建的文件。文件名应该是在使用ipc进行操作是，这个操作系统名称空间中唯一的。这个文件名还必须满足操作系统对正常文件名在格式和长度上的限制。
+
+当地址是*的时候，zmq_bind()函数会生成一个临时的文件名。调用者需要使用ZMQ_LAST_ENDPOINT属性获取此文件名。查看zmq_getsockopt(3)函数获取更多细节。
+
+所有绑定在一个已经存在的文件名的动作都会被重载。在这种情况下，ipc协议和tcp或者inproc协议是不一样的。
+连接一个socket
+
+当使用zmq_connect()函数向一个对端发起ipc连接的时候，终结点需要是一个能够唯一标志一个文件名的任意字符串。这个文件名必须是已经由操作系统创建，并且被分配给了一个通过zmq_bind()操作过的socket。
+
+Examples
+
+　　给一个socket分配一个地址
+
+//  Assign the pathname "/tmp/feeds/0"
+rc = zmq_bind(socket, "ipc:///tmp/feeds/0");
+assert (rc == 0);
+　　连接一个socket
+
+//  Connect to the pathname "/tmp/feeds/0"
+rc = zmq_connect(socket, "ipc:///tmp/feeds/0");
+assert (rc == 0);
+See also
+
+zmq_bind(3)  zmq_connect(3)  zmq_inproc(7)  zmq_tcp(7)  zmq_pgm(7)  zmq_getsockopt(3)  zmq(7)
+
+Authors
+
+This ØMQ manual page was written by Pieter Hintjens <ph@imatix.com>, Martin Sustrik <sustrik@250bpm.com> and Martin Lucina <mato@kotelna.sk>.
+
+Web site design and content is copyright (c) 2007-2012 iMatix Corporation. Contact us for professional support. Site content licensed under the Creative Commons Attribution-Share Alike 3.0 License. ØMQ is copyright (c) Copyright (c) 2007-2012 iMatix Corporation and Contributors. ØMQ is free software licensed under the LGPL. ØMQ, ZeroMQ, and 0MQ are trademarks of iMatix Corporation. Terms of Use — Privacy
+
+Policy
