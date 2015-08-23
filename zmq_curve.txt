@@ -1,0 +1,70 @@
+zmq_curve(7) 　　　　ØMQ Manual - ØMQ/4.1.0
+
+Name
+
+zmq_curve – 安全的认证方式和保密方式
+
+Synopsis
+
+CURVE机制定义了一种安全的认证方式和保密方式，用于客户端和服务器之间的交流。CURVE 计划用于工作在公网上。CURVE机制在RFC文档 http://rfc.zeromq.org/spec:25 中进行了定义。
+客户端和服务器的任务
+
+一个使用CURVE的socket在任何时候既可以是客户端也可以说服务器，但不能同时兼任两者。bind/connect的任务是独立进行的。
+
+一个socket可以在任意时刻通过修改属性来改变工作方式。工作方式的改变会影响在改变之后调用的所有zmq_bind和zmq_connect函数。
+
+想要使一个socket作为CURVE服务端使用，应用进程需要设置socket的ZMQ_CURVE_SERVER属性，然后设置ZMQ_CURVE_SECRETKEY属性来为这个socket提供长期有效的密码。应用进程不需要提供给这个socket长期的公共密钥，这个密钥只在客户端使用。
+
+想要使一个socket作为CURVE客户端使用，应用程序需要使用这个socket想要连接到的服务端的长期公钥设置自己的ZMQ_CURVE_SERVERKEY属性；或者紧接着接受到来的连接请求。然后，应用程序用它的客户端的长期密钥对设置ZMQ_CURVE_PUBLICKEY 和ZMQ_CURVE_SECRETKEY属性。
+
+如果服务端要使用认证方式，那么它将基于客户端的长期有效公钥。
+
+Key encoding
+
+在源代码中，密钥的标准形式是基于base 256（二进制数据）的32B数据，或者使用Z85算法生成的基于base 85的40B的数据，Z85算法在RFC文档 http://rfc.zeromq.org/spec:32 中进行了定义。
+
+Z85算法被设计用来生成可打印字符组成的密钥，用来在配置文件、命令行和代码中使用。这里有一个使用C语言完成的接口描述：https://github.com/zeromq/rfc/tree/master/src
+
+Test key values
+
+作为测试，服务端使用下面这个长时有效密钥对（以Z85加密的16进制表示）：
+
+公钥：
+
+BB88471D65E2659B30C55A5321CEBB5AAB2B70A398645C26DCA2B2FCB43FC518
+
+Yne@$w-vo<fVvi]a<NY6T1ed:M$fCG*[IaLV{hID
+
+密钥：
+
+7BB864B489AFA3671FBE69101F94B38972F24816DFB01B51656B3FEC8DFD0888
+
+D:)Q[IlAW!ahhC2ac:9*A}h:p?([4%wOTJ%JR%cs
+
+服务端将使用下面的密钥对（以Z85加密的16进制表示）：
+
+公钥：
+
+54FCBA24E93249969316FB617C872BB0C1D1FF14800427C594CBFACF1BC2D652
+
+rq:rM>}U?@Lns47E1%kR.o@n%FcmmsL\/@{H8]yf7
+
+密钥：
+
+8E0BDD697628B91D8F245587EE95C5B04D48963F79259877B49CD9063AEAD3B7
+
+JTKVSB%%)wK0E.X)V>+}o?pNmC{O&4W4b!Ni{Lh6
+
+See also
+
+zmq_z85_encode(3)  zmq_z85_decode(3)  zmq_setsockopt(3)  zmq_null(7)  zmq_plain(7)  zmq(7)
+
+Authors
+
+This page was written by the ØMQ community. To make a change please read the ØMQ Contribution Policy at http://www.zeromq.org/docs:contributing.
+
+ 
+
+Web site design and content is copyright (c) 2007-2012 iMatix Corporation. Contact us for professional support. Site content licensed under the Creative Commons Attribution-Share Alike 3.0 License. ØMQ is copyright (c) Copyright (c) 2007-2012 iMatix Corporation and Contributors. ØMQ is free software licensed under the LGPL. ØMQ, ZeroMQ, and 0MQ are trademarks of iMatix Corporation. Terms of Use — Privacy
+
+Policy
