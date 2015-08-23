@@ -1,0 +1,85 @@
+zmq_send(3)              ØMQ Manual - ØMQ/4.1.0
+
+Name
+
+zmq_send – 在一个socket上发送一个消息帧
+
+Synopsis
+
+int zmq_send (void *socket, void *buf, size_t len, int flags);
+Description
+
+zmq_send()函数会根据buf参数指定的内存缓冲区和len参数指定的缓冲区数据长度创建一个消息，并将消息添加到消息队列中。flags参数是由下面的标志组合成的。
+
+　　ZMQ_DONTWAIT
+
+　　　　对于当socket不可使用就要执行阻塞方式的socket类型来说（DEALER，PUSH），此选项可以指定这个操作以非阻塞模式执行。如果无法添加消息到socket的消息队列上，zmq_send()函数将会执行失败并设置errno为EAGAIN。
+
+　　ZMQ_SNDMORE
+
+　　　　指出当前正在发送的消息是个多帧消息，并且接下来还会发送更多的消息。请参考下面关于多帧消息的段落，获取更多的细节。
+
+成功的调用zmq_send()函数并不能说明消息已经被成功的发送到了网络上，只能说明消息被添加到了这个socket的消息队列上，并且ZMQ开始对其负责。
+Multi-part messages
+
+一个ZMQ消息由1个或多个ZMQ消息帧组成。ZMQ保证自动交付消息：一个ZMQ的消息要么所有的消息帧都被接收，要么一个都不会接收。一个消息中消息帧的总数没有限制，除非内存不够用。
+
+当一个应用程序在发送多针消息的时候，出了最后一帧消息，其它的所有消息必须使用ZMQ_SNDMORE进行注明。
+
+Return value
+
+当zmq_send()函数执行成功时会返回发送的消息的字节数。否则返回 -1，并且设置errno的值为下列定义的值。
+
+Errors
+
+　　EAGAIN
+
+　　　　函数正在使用非阻塞模式发送消息，并且socket当前不可用。
+
+　　ENOTSUP
+
+　　　　这个scoket的类型不支持zmq_send()函数的操作。
+
+　　EFSM
+
+　　　　zmq_send()函数当前无法对这个socket进行操作，因为这个socket处在与此操作不适当的状态。这个错误可能出现在那些在几种状态之间进行切换的socket上，比如ZMQ_REP。请参照zmq_socket(3)函数部分的消息模式部分以获取更多信息。
+
+　　ETERM
+
+　　　　与给定的socket向关联的context被终结了。
+
+　　ENOTSOCK
+
+　　　　参数提供的socket不可用。
+
+　　EINTR
+
+　　　　此次操作被系统信号中断了。
+
+　　EHOSTUNREACH
+
+　　　　此消息不能被路由。
+
+Example
+
+　　发送一个多帧消息
+/* Send a multi-part message consisting of three parts to socket */
+rc = zmq_send (socket, "ABC", 3, ZMQ_SNDMORE);
+assert (rc == 3);
+rc = zmq_send (socket, "DEFGH", 5, ZMQ_SNDMORE);
+assert (rc == 5);
+/* Final part; no more parts to follow */
+rc = zmq_send (socket, "JK", 2, 0); assert (rc == 2);
+
+
+See also
+
+zmq_send_const(3)  zmq_recv(3)  zmq_socket(7)  zmq(7)
+
+Authors
+
+This page was written by the ØMQ community. To make a change please read the ØMQ Contribution Policy at http://www.zeromq.org/docs:contributing.
+
+Web site design and content is copyright (c) 2007-2012 iMatix Corporation. Contact us for professional support. Site content licensed under the Creative Commons Attribution-Share Alike 3.0 License. ØMQ is copyright (c) Copyright (c) 2007-2012 iMatix Corporation and Contributors. ØMQ is free software licensed under the LGPL. ØMQ, ZeroMQ, and 0MQ are trademarks of iMatix Corporation. Terms of Use — Privacy
+
+Policy
