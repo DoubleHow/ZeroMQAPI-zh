@@ -1,0 +1,42 @@
+zmq_strerror(3)　　　　 ØMQ Manual - ØMQ/4.1.0
+
+Name
+
+zmq_strerror - 获取ZMQ错误描述字符串
+
+Synopsis
+
+const char *zmq_strerror (int errnum);
+Description
+
+zmq_strerror()函数会返回errnum参数对应的错误描述字符串的指针。由于ZMQ在操作系统之上增加了错误定义，应用程序更应该倾向于使用zmq_strerror() 函数而不是标准函数strerror() 。
+
+Return value
+
+zmq_strerror()函数返错误描述字符串的指针。
+
+Errors
+
+　　没有定义错误代码。
+
+Example
+
+　　显示一个ZMQ context无法被初始化的错误信息
+
+void *ctx = zmq_init (1, 1, 0);
+if (!ctx) {
+    printf ("Error occurred during zmq_init(): %s\n", zmq_strerror (errno));
+abort (); 
+
+}
+See also
+
+zmq(7)
+
+Authors
+
+This page was written by the ØMQ community. To make a change please read the ØMQ Contribution Policy at http://www.zeromq.org/docs:contributing.
+
+Web site design and content is copyright (c) 2007-2012 iMatix Corporation. Contact us for professional support. Site content licensed under the Creative Commons Attribution-Share Alike 3.0 License. ØMQ is copyright (c) Copyright (c) 2007-2012 iMatix Corporation and Contributors. ØMQ is free software licensed under the LGPL. ØMQ, ZeroMQ, and 0MQ are trademarks of iMatix Corporation. Terms of Use — Privacy
+
+Policy
