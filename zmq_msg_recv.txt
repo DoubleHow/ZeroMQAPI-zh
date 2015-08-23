@@ -1,0 +1,113 @@
+zmq_msg_recv(3) 　　　　ØMQ Manual - ØMQ/3.2.5
+
+Name
+
+zmq_msg_recv - 从一个socket中接受一个消息帧
+Synopsis
+
+int zmq_msg_recv (zmq_msg_t *msg, void *socket, int flags);
+Description
+
+zmq_msg_recv()函数和zmq_recvmsg(3)函数是完全相同的，但是zmq_recvmsg(3)函数将在以后的版本中被丢弃。zmq_msg_recv()函数和其它的函数更符合一些。
+
+zmq_msg_recv()函数将会从socket参数指定的的socket中读取消息帧，并存储在msg参数指定的ZMQ消息结构间中。以前存储在消息msg中的内容会被准确的释放。如果此刻，在socekt参数指定的的socket上没有消息可以接收，zmq_msg_recv()会进入阻塞状态，直到其请求被满足为止。flags参数是下列一些标志的组合。
+
+　　ZMQ_DONTWAIT
+
+　　　　指定本次操作以非阻塞模式进行。如果在指定的socket上没有消息可以接收，zmq_msg_recv()函数将会执行失败，并设置errno的值为EAGAIN。
+
+　　多部分消息（Multi-part messages）
+
+　　　　一个ZMQ消息是由1个或多个段组成的。每个消息段都是一个对立的zmq_msg_t消息结构。ZMQ确保对消息进行原子交付：每个socket或者接收整个消息，或者一个消息段也不接收。每个消息中的段数是不受限制的，除非内存不够用了。
+
+对于执行多分段消息的进程，每次在执行zmq_msg_recv()后需要检测ZMQ_RCVMORE zmq_getsockopt(3)属性，以确定是否还有剩余的消息段可以接收。
+
+Return value
+
+如果zmq_msg_recv() 函数执行成功，会以B为单位返回消息的大小。否则返回 -1，并且设置errno的值为下列指定的值。
+
+Errors
+
+　　EAGAIN
+
+　　　　以非阻塞模式接收数据执行时当前消息队列中没有消息。
+
+　　ENOTSUP
+
+　　　　此socket的类型不支持zmq_msg_recv()函数。
+
+　　EFSM
+
+　　　　由于socket当前处于不可用状态，zmq_msg_recv()函数无法对这个socket进行操作。这个错误的发成常常由于socket的类型正在几种不同的状态间转变过程中，比如ZMQ_REP。请查看zmq_socket(3)函数的消息模式章节以得到更多信息。
+
+　　ETERM
+
+　　　　与socket相联系的context被终结了。
+
+　　ENOTSOCK
+
+　　　　参数提供的socket不可用。
+
+　　EINTR
+
+　　　　在一个消息可以使用前，因为收到系统信号，这个操作被中断了。
+
+　　EFAULT
+
+　　　　参数传递给函数的消息不可用。
+
+Example
+
+　　从一个socket接收消息
+/* Create an empty ØMQ message */
+zmq_msg_t msg;
+int rc = zmq_msg_init (&msg);
+assert (rc == 0);
+/* Block until a message is available to be received from socket */
+rc = zmq_msg_recv (&msg, socket, 0);
+assert (rc != -1);
+/* Release message */ zmq_msg_close (&msg);
+
+　　接收一个由多段组成的消息
+
+int64_t more;
+
+size_t more_size = sizeof more;
+
+do {
+
+    /* Create an empty ØMQ message to hold the message part */
+
+    zmq_msg_t part;
+
+    int rc = zmq_msg_init (&part);
+
+    assert (rc == 0);
+
+    /* Block until a message is available to be received from socket */
+
+    rc = zmq_msg_recv (&part, socket, 0);
+
+    assert (rc != -1);
+
+    /* Determine if more message parts are to follow */
+
+    rc = zmq_getsockopt (socket, ZMQ_RCVMORE, &more, &more_size);
+
+    assert (rc == 0);
+
+zmq_msg_close (&part); 
+
+} while (more);
+
+See also
+
+zmq_recv(3) zmq_send(3) zmq_msg_send(3) zmq_getsockopt(3) zmq_socket(7) zmq(7)
+
+Authors
+
+This man page was written by Martin Sustrik <sustrik@250bpm.com>, Martin Lucina <martin@lucina.net>, and Pieter Hintjens <ph@imatix.com>.
+
+Web site design and content is copyright (c) 2007-2012 iMatix Corporation. Contact us for professional support. Site content licensed under the Creative Commons Attribution-Share Alike 3.0 License. ØMQ is copyright (c) Copyright (c) 2007-2012 iMatix Corporation and Contributors. ØMQ is free software licensed under the LGPL. ØMQ, ZeroMQ, and 0MQ are trademarks of iMatix Corporation. Terms of Use — Privacy
+
+Policy
