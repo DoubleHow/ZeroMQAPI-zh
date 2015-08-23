@@ -1,0 +1,103 @@
+zmq_recvmsg(3)         ØMQ Manual - ØMQ/4.1.0
+
+Name
+
+zmq_recvmsg – 从一个socket上接收一个消息帧
+
+Synopsis
+
+int zmq_recvmsg (void *socket, zmq_msg_t *msg, int flags);
+Description
+
+函数zmq_recvmsg()会从socket参数指定的socket中接收一个消息，并将其存储在msg参数指定的消息消息对象中。所有之前存储在msg中的内容都会被适当的释放。如果socket参数指定的socket上没有接收到消息，zmq_recvmsg()函数会进行阻塞等待，直到请求被满足。flags参数由下面定义的标志组合而成。
+
+　　ZMQ_DONTWAIT
+
+指定本次操作以非阻塞模式执行。如果socket上此刻没有接收到消息，zmq_recvmsg()函数会执行失败，并设施errno的值为EAGAIN。
+
+此API已被弃用，建议使用zmq_msg_recv(3)函数。
+Multi-part messages
+
+一个ZMQ消息由1个或多个ZMQ消息帧组成。每一个消息帧都是一个独立的消息对象。ZMQ保证自动交付消息：一个ZMQ的消息要么所有的消息帧都被接收，要么一个都不会接收。一个消息中消息帧的总数没有限制，除非内存不够用。
+
+应用进程在使用多帧消息时，调用zmq_recvmsg()函数之后必须使用zmq_getsockopt(3)的ZMQ_RCVMORE选项进行检查，以确定是否还有更多的消息等待接收。
+
+Return value
+
+当zmq_recvmsg()函数执行成功后会返回接收到的消息字节数。否则函数返回 -1，并且设置errno的值为下列值。
+
+Errors
+
+　　EAGAIN
+
+　　　　使用非阻塞方式接收消息时，当前socket上没有消息可用。
+
+　　ENOTSUP
+
+　　　　给定socket的类型不支持zmq_recvmsg()函数的操作。
+
+　　EFSM
+
+　　　　由于socket处在不适当的状态，zmq_recvmsg()函数无法对这个socket执行本次操作。这个错误会发生在当socket状态在几种状态间进行转变的过程中，比如ZMQ_REP类型的socket。参见zmq_socket(3)函数中关于消息模式的章节获取更多信息。
+
+　　ETERM
+
+　　　　与给定的socket相联系的context被终结了。
+
+　　ENOTSOCK
+
+　　　　参数给定的socket不可用。
+
+　　EINTR
+
+　　　　在接收到消息之前，本次操作被系统信号中断了。
+
+　　EFAULT
+
+　　　　参数指定的msg对象不可用。
+
+Example
+
+　　从一个socket上接收一个消息
+/* Create an empty ØMQ message *
+zmq_msg_t msg;
+int rc = zmq_msg_init (&msg);
+assert (rc == 0); 
+/* Block until a message is available to be received from socket */
+rc = zmq_recvmsg (socket, &msg, 0); 
+assert (rc != -1);
+/* Release message */
+zmq_msg_close (&msg);
+
+
+接收一个多帧消息
+int64_t more;
+size_t more_size = sizeof (more);
+do {
+    /* Create an empty ØMQ message to hold the message part *
+    zmq_msg_t part;
+    int rc = zmq_msg_init (&part);
+    assert (rc == 0);
+    /* Block until a message is available to be received from socket */
+    rc = zmq_recvmsg (socket, &part, 0);
+    assert (rc != -1);
+    /* Determine if more message parts are to follow */
+    rc = zmq_getsockopt (socket, ZMQ_RCVMORE, &more, &more_size);
+    assert (rc == 0);
+    zmq_msg_close (&part); 
+} while (more);
+
+
+See also
+
+zmq_recv(3)  zmq_send(3)  zmq_getsockopt(3)  zmq_socket(7)  zmq(7)
+
+Authors
+
+This page was written by the ØMQ community. To make a change please read the ØMQ Contribution Policy at http://www.zeromq.org/docs:contributing.
+
+Web site design and content is copyright (c) 2007-2012 iMatix Corporation. Contact us for professional support. Site content licensed under the Creative Commons Attribution-Share Alike 3.0 License. ØMQ is copyright (c) Copyright (c) 2007-2012 iMatix Corporation and Contributors. ØMQ is free software licensed 14-1-8 zmq_recvmsg(3) - 0MQ Api api.zeromq.org/4-1:zmq-recvmsg 3/3
+
+under the LGPL. ØMQ, ZeroMQ, and 0MQ are trademarks of iMatix Corporation. Terms of Use — Privacy
+
+Policy
