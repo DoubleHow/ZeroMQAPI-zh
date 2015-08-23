@@ -1,0 +1,57 @@
+zmq_unbind(3) 　　　　ØMQ Manual - ØMQ/4.1.0
+
+Name
+
+zmq_unbind - 停止连接外来的请求
+
+Synopsis
+
+int zmq_unbind (void *socket, const char *endpoint);
+Description
+
+zmq_unbind()函数会将socket参数指定的socket上绑定的endpoint指定的终结点解除绑定。
+
+endpoint参数也就是在函数zmq_bind(3)中的参数。
+
+Return value
+
+函数zmq_unbind()执行成功返回0。否则返回 -1，并且设置errno的值为下列定义的值。
+
+Errors
+
+　　EINVAL
+
+　　　　endpoint参数不可用。
+
+　　ETERM
+
+　　　　与socket参数指定的socket关联的ZMQ context 已经被终结。
+
+　　ENOTSOCK
+
+　　　　socket参数不可用。
+
+Example
+
+将一个分发者socket从TCP传输方式中接触绑定
+
+/* Create a ZMQ_SUB socket */
+void *socket = zmq_socket (context, ZMQ_SUB);
+assert (socket);
+/* Connect it to the host server001, port 5555 using a TCP transport */
+rc = zmq_bind (socket, "tcp://127.0.0.1:5555");
+assert (rc == 0);
+/* Disconnect from the previously connected endpoint */
+rc = zmq_unbind (socket, "tcp://127.0.0.1:5555"); assert (rc == 0);
+
+See also
+
+zmq_bind(3)  zmq_socket(3)  zmq(7)
+
+Authors
+
+This page was written by the ØMQ community. To make a change please read the ØMQ Contribution Policy at http://www.zeromq.org/docs:contributing.
+
+Web site design and content is copyright (c) 2007-2012 iMatix Corporation. Contact us for professional support. Site content licensed under the Creative Commons Attribution-Share Alike 3.0 License. ØMQ is copyright (c) Copyright (c) 2007-2012 iMatix Corporation and Contributors. ØMQ is free software licensed under the LGPL. ØMQ, ZeroMQ, and 0MQ are trademarks of iMatix Corporation. Terms of Use — Privacy
+
+Policy
