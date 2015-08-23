@@ -1,0 +1,23 @@
+zmq_null(7) 　　ØMQ Manual - ØMQ/4.1.0
+
+Name
+
+zmq_null - 无安全和加密
+
+Synopsis
+
+NULL机制在ZMQ RFC文档ZMTP 3.0中进行了定义。http://rfc.zeromq.org/spec:23
+
+这是ZMQ socket的默认安全机制。
+
+See also
+
+zmq_plain(7)  zmq_curve(7)  zmq(7)
+
+Authors
+
+This page was written by the ØMQ community. To make a change please read the ØMQ Contribution Policy at http://www.zeromq.org/docs:contributing.
+
+Web site design and content is copyright (c) 2007-2012 iMatix Corporation. Contact us for professional support. Site content licensed under the Creative Commons Attribution-Share Alike 3.0 License. ØMQ is copyright (c) Copyright (c) 2007-2012 iMatix Corporation and Contributors. ØMQ is free software licensed under the LGPL. ØMQ, ZeroMQ, and 0MQ are trademarks of iMatix Corporation. Terms of Use — Privacy
+
+Policy
