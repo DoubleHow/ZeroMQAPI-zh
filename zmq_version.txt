@@ -1,0 +1,39 @@
+zmq_version(3)          ØMQ Manual - ØMQ/4.1.0
+
+Name
+
+zmq_version – 返回ZMQ链接库的版本
+
+Synopsis
+
+void zmq_version (int *major, int *minor, int *patch);
+Description
+
+zmq_version()函数会将ZMQ库中对应的版本号填到参数major、minor和patch指定的存储空间中。
+
+这个函数用来提供给想使用ZMQ动态链接库的应用程序或者语言，以确定使用使用这个版本。
+
+Return value
+
+没有返回值。
+
+Errors
+
+没有定义错误代码。
+
+Example
+
+　　输出ZMQ链接库的版本。
+
+int major, minor, patch;
+
+zmq_version (&major, &minor, &patch); printf ("Current ØMQ version is %d.%d.%d\n", major, minor, patch);
+See also
+
+zmq(7)
+
+Authors
+
+This page was written by the ØMQ community. To make a change please read the ØMQ Contribution Policy at http://www.zeromq.org/docs:contributing.
+
+Web site design and content is copyright (c) 2007-2012 iMatix Corporation. Contact us for professional support. Site content licensed under the Creative Commons Attribution-Share Alike 3.0 License. ØMQ is copyright (c) Copyright (c) 2007-2012 iMatix Corporation and Contributors. ØMQ is free software licensed under the LGPL. ØMQ, ZeroMQ, and 0MQ are trademarks of iMatix Corporation. Terms of Use — Privacy Policy
