@@ -1,0 +1,56 @@
+zmq_msg_init_data(3)　　　　 ØMQ Manual - ØMQ/3.2.5
+
+Name
+
+zmq_msg_init_data - 从一个指定的存储空间中初始化一个ZMQ消息对象的数据
+
+Synopsis
+
+typedef void (zmq_free_fn) (void *data, void *hint);
+int zmq_msg_init_data (zmq_msg_t *msg, void *data, size_t size, zmq_free_fn *ffn,
+void *hint);
+Description
+
+zmq_msg_init_data()函数会用data参数和size参数指定的数据对msg参数指定的ZMQ消息对象的内容进行初始化。ZMQ不会执行拷贝操作，并且ZMQ会取得指定数据的拥有权。
+
+如果提供了回收功能函数ffn，ffn将会在data数据不再使用的时候被ZMQ调用一次，ZMQ会将zmq_msg_init_data()函数中的参数data和hint参数传递给ffn函数。
+
+永远不要直接对zmq_msg_t对象进行直接操作，而是要使用zmq_msg函数族进行操作。
+
+zmq_msg_init()、zmq_msg_init_data()和zmq_msg_init_size()这三个函数是互斥的。永远不要把一个zmq_msg_t对象初始化两次。
+
+Return value
+
+函数zmq_msg_init_data()执行成功会返回0。否则返回 -1，并且设置errno的值为下列指定的值。
+
+Errors
+
+　　ENOMEM
+
+　　　　存储空间不足。
+
+Example
+
+　　使用一个指定的存储空间对ZMQ消息对象进行初始化。
+void my_free (void *data, void *hint)
+{
+    free (data);
+}
+/*  ...  */
+void *data = malloc (6);
+assert (data);
+memcpy (data, "ABCDEF", 6); 
+zmq_msg_t msg;
+rc = zmq_msg_init_data (&msg, data, 6, my_free, NULL); assert (rc == 0);
+
+See also
+
+zmq_msg_init_size(3)  zmq_msg_init(3)  zmq_msg_close(3)  zmq_msg_data(3)  zmq_msg_size(3)  zmq(7)
+
+Authors
+
+This ØMQ manual page was written by Martin Sustrik <sustrik@250bpm.com> and Martin Lucina <mato@kotelna.sk>.
+
+Web site design and content is copyright (c) 2007-2012 iMatix Corporation. Contact us for professional support. Site content licensed under the Creative Commons Attribution-Share Alike 3.0 License. ØMQ is copyright (c) Copyright (c) 2007-2012 iMatix Corporation and Contributors. ØMQ is free software licensed under the LGPL. ØMQ, ZeroMQ, and 0MQ are trademarks of iMatix Corporation. Terms of Use — Privacy
+
+Policy
