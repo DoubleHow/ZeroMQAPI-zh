@@ -1,2 +1,2 @@
 # ZeroMQAPI-zh
-ZqroMO API document for simplified Chinese
+ZeroMQ API document for simplified Chinese
