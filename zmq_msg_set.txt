@@ -1,0 +1,36 @@
+zmq_msg_set(3) 　　　　 ØMQ Manual - ØMQ/3.2.5
+
+Name
+
+zmq_msg_set - 设置消息的性质
+
+Synopsis
+
+int zmq_msg_set (zmq_msg_t *message, int property, int value);
+Description
+
+zmq_msg_set()函数会设置message参数指定的消息的属性，属性值由value参数指定，属性名称由property参数指定。
+
+目前来讲（此版本是ØMQ/3.2.5，查了下ØMQ/4.2.0，同样不支持），zmq_msg_set()啥属性名都不支持。（我了个去……）
+
+Return value
+
+zmq_msg_set() 函数执行成功返回0。否则返回 -1，并且设置errno为下列指定的值。
+
+Errors
+
+　　EINVAL
+
+　　　　请求的属性值未知。
+
+See also
+
+zmq_msg_get(3)  zmq(7)
+
+Authors
+
+This ØMQ manual page was written by Pieter Hintjens <ph@imatix.com>.
+
+Web site design and content is copyright (c) 2007-2012 iMatix Corporation. Contact us for professional support. Site content licensed under the Creative Commons Attribution-Share Alike 3.0 License. ØMQ is copyright (c) Copyright (c) 2007-2012 iMatix Corporation and Contributors. ØMQ is free software licensed under the LGPL. ØMQ, ZeroMQ, and 0MQ are trademarks of iMatix Corporation. Terms of Use — Privacy
+
+Policy
