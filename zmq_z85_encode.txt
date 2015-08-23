@@ -1,0 +1,41 @@
+zmq_z85_encode(3)          ØMQ Manual - ØMQ/4.1.0
+
+Name
+
+zmq_z85_encode – 使用Z85算法对一个二进制秘钥进行加密，输出可打印的文本
+
+Synopsis
+
+char *zmq_z85_encode (char *dest, uint8_t *data, size_t size);
+Description
+
+zmq_z85_encode()函数会对data参数和size参数指定的二进制数据块进行加密，并以字符串形式存储在dest参数指定的空间内。这个二进制数据块的大小必须是可以被4整除的。dest参数指定的空间大小至少满足size * 1.25 + 1，最后1个字节用来存储字符串结束符。一个32B长的密码会被加密后会变成40B长再加1B的空字符。
+
+加密方式遵循ZMQ RFC 32 规格。
+
+Return value
+
+如果zmq_z85_encode()函数执行成功，则会返回dest的指针，否则返回NULL。
+
+Example
+
+　　加密一个curve密码
+
+#include <sodium.h>
+uint8_t public_key [32];
+uint8_t secret_key [32];
+int rc = crypto_box_keypair (public_key, secret_key);
+assert (rc == 0);
+char encoded [41];
+zmq_z85_encode (encoded, public_key, 32); puts (encoded);
+See also
+
+zmq_z85_decode(3)  zmq_curve_keypair(3)  zmq_curve(7)
+
+Authors
+
+This page was written by the ØMQ community. To make a change please read the ØMQ Contribution Policy at http://www.zeromq.org/docs:contributing.
+
+Web site design and content is copyright (c) 2007-2012 iMatix Corporation. Contact us for professional support. Site content licensed under the Creative Commons Attribution-Share Alike 3.0 License. ØMQ is copyright (c) Copyright (c) 2007-2012 iMatix Corporation and Contributors. ØMQ is free software licensed under the LGPL. ØMQ, ZeroMQ, and 0MQ are trademarks of iMatix Corporation. Terms of Use — Privacy
+
+Policy
