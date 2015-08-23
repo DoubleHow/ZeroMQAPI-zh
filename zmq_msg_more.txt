@@ -1,0 +1,52 @@
+zmq_msg_more(3) 　　　　ØMQ Manual - ØMQ/3.2.5
+
+Name
+
+zmq_msg_more - 指出是不是还有更多的消息部分可以接收
+
+Synopsis
+
+int zmq_msg_more (zmq_msg_t *message);
+Description
+
+zmq_msg_more()函数指出在多个消息部分中是否还有更多的消息可以接收，或者当前的消息是不是属于还未接收完的多部分消息中的一个。
+
+Return value
+
+如果这是多个消息中最后一条消息，或者单消息中的唯一一条消息，zmq_msg_more()函数会返回0。如果有更多的消息等待接收，函数会返回 1。
+
+Example
+
+　　接收一个多部分消息
+zmq_msg_t part;
+while (true) 
+{
+    //  Create an empty ØMQ message to hold the message par
+    int rc = zmq_msg_init (&part);
+    assert (rc == 0); 
+    //  Block until a message is available to be received from socket
+    rc = zmq_recvmsg (socket, &part, 0); 
+    assert (rc != -1);
+    if (zmq_msg_more (&part))
+    {   
+        fprintf (stderr, "more\n");
+    }   
+    else
+    {   
+        fprintf (stderr, "end\n");
+        break;
+    }   
+    zmq_msg_close (part); 
+}
+
+See also
+
+zmq_msg_get(3)  zmq_msg_set(3)  zmq_msg_init(3)  zmq_msg_close(3)  zmq(7)
+
+Authors
+
+This ØMQ manual page was written by Chuck Remes <cremes@mac.com> and Pieter Hintjens <ph@imatix.com>.
+
+Web site design and content is copyright (c) 2007-2012 iMatix Corporation. Contact us for professional support. Site content licensed under the Creative Commons Attribution-Share Alike 3.0 License. ØMQ is copyright (c) Copyright (c) 2007-2012 iMatix Corporation and Contributors. ØMQ is free software licensed under the LGPL. ØMQ, ZeroMQ, and 0MQ are trademarks of iMatix Corporation. Terms of Use — Privacy
+
+Policy
