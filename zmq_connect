@@ -1,0 +1,99 @@
+zmq_connect(3) 　　　　ØMQ Manual - ØMQ/3.2.5
+
+Name
+
+zmq_connect - 由一个socket创建一个对外连接（outgoing connection）
+
+Synopsis
+
+int zmq_connect (void *socket, const char *endpoint);
+Description
+
+zmq_connect()函数将socket连接到节点endpoint上，然后开始接受在这个节点上的到来的连接请求。
+
+endpoint是一个字符串，包含一个协议://紧跟一个address地址。协议有下列的协议指定。address指定要进行绑定的用来传输的地址。
+
+ZMQ 提供以下的通信协议：
+
+tcp
+
+　　使用tcp进行可靠的单播协议。参见按zmq_tcp(7)
+
+ipc
+
+　　本地进程间信息传送，参见按zmq_ipc(7)
+
+inproc
+
+　　本地进程内（线程间）消息传送，参见zmq_inproc(7)
+
+pgm, epgm
+
+　　使用PGM进行可靠的多路广播传输，参见zmq_pgm(7)
+
+除了ZMQ_PAIR之外，所有的ZMQ socket类型都支持一对多和多对一传输方式。这种精确的多路传输依赖于在zmq_socket(3)中定义的socket类型。
+
+对于多数的传输和socket类型，连接并不会被立刻执行，但是却是ZMQ所必需的。这样一来，成功的调用zmq_connect()并不意味着连接已经真实的建立好了。因此，对多数传输和socket类型来说，是服务器先进性绑定还是客户端先进性连接请求是没有什么区别的。首先的例外是什么时候使用inproc://传输：你必须在调用zmq_connect()之前执行zmq_bind() 。然后就是ZMQ_PAIR类型的socket，这类socket不会自动对这个节点地址进行重新连接。
+zmq_connect()函数之后，socket会进入普通ready状态。和zmq_bind() 对照来看，zmq_bind() 会进入静音状态，在这种状态下，socket会进行阻塞或者丢弃消息，当然，这要看zmq_socket(3)中指定的socket的类型。
+Return value
+
+执行成功时zmq_connect()会返回0。其它情况返回 -1， 并且设置errno为下列的值。
+
+Errors
+
+EINVAL
+
+　　提供的节点不可用。
+
+EPROTONOSUPPORT
+
+　　不支持请求使用的传输协议。
+
+ENOCOMPATPROTO
+
+　　请求使用的传输协议和socket的类型不兼容。
+
+ETERM
+
+　　和给定的socket相连的ZMQ context 被终结了。
+
+ENOTSOCK
+
+　　提供的socket不可用。
+
+EMTHREAD
+
+　　没有可用的I/O线程可以用来完成此任务。
+
+Example
+
+复制代码
+ 1 /* Create a ZMQ_SUB socket */
+ 2 
+ 3 void *socket = zmq_socket (context, ZMQ_SUB);
+ 4 
+ 5 assert (socket);
+ 6 
+ 7 /* Connect it to an in-process transport with the address 'my_publisher
+ 8 
+ 9 int rc = zmq_connect (socket, "inproc://my_publisher");
+10 
+11 assert (rc == 0);
+12 
+13 /* Connect it to the host server001, port 5555 using a TCP transport */
+14 
+15 rc = zmq_connect (socket, "tcp://server001:5555"); assert (rc == 0);
+复制代码
+See also
+
+zmq_bind(3)  zmq_socket(3)  zmq(7)
+
+Authors
+
+This ØMQ manual page was written by Pieter Hintjens <ph@imatix.com>, Martin Sustrik
+
+<sustrik@250bpm.com> and Martin Lucina <mato@kotelna.sk>.
+
+Web site design and content is copyright (c) 2007-2012 iMatix Corporation. Contact us for professional support. Site content licensed under the Creative Commons Attribution-Share Alike 3.0 License. ØMQ is copyright (c) Copyright (c) 2007-2012 iMatix Corporation and Contributors. ØMQ is free software licensed under the LGPL. ØMQ, ZeroMQ, and 0MQ are trademarks of iMatix Corporation. Terms of Use — Privacy 
+
+Policy
