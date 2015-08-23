@@ -1,0 +1,70 @@
+zmq_recv(3)        ØMQ Manual - ØMQ/4.1.0
+
+Name
+
+zmq_recv – 从一个socket上接收一个消息帧
+
+Synopsis
+
+int zmq_recv (void *socket, void *buf, size_t len, int flags);
+Description
+
+zmq_recv()函数会从socket参数指定的socket上接收一个消息，并把这个消息存储在buf参数指定的内存空间中。超过len参数指定长度的任何数据都会被删去。如果在socket上没有消息可接收，zmq_recv()函数会进行阻塞，直到请求被满足为止。flag参数是由下面的选项组合而成的标志。
+
+　　ZMQ_DONTWAIT
+
+　　　　指明此函数在非阻塞模式下执行。如果在指定的socket中没有消息，zmq_recv()函数会执行失败，并返回值为EAGAIN的errno。
+
+Multi-part messages
+
+一个ZMQ消息由1个或多个ZMQ消息帧组成。ZMQ保证自动交付消息：一个ZMQ的消息要么所有的消息帧都被接收，要么一个都不会接收。一个消息中消息帧的总数没有限制，除非内存不够用。
+
+一个应用进程想要接收多帧的ZMQ消息，必须在zmq_recv()函数执行完成后使用zmq_getsockopt(3)函数的ZMQ_RCVMORE标志选项进行检查，以确认是否还有更多的消息帧等待接收。
+
+Return value
+
+如果zmq_recv()函数执行成功，将会返回接收到的消息的字节数。注意这个值可能会超过len参数指定的值，以免消息被截断。如果执行失败，这个函数将会返回 -1，并且设置errno的值为下列指定的值。
+
+Errors
+
+　　EAGAIN
+
+　　　　使用非阻塞方式接收消息的时候没有接收到任何消息。
+
+　　ENOTSUP
+
+　　　　socket参数指定的socket类型无法使用zmq_recv()进行操作。
+
+　　EFSM
+
+　　　　zmq_recv()函数当前无法对这个socket进行操作，因为这个socket处在与此操作不适当的状态。这个错误可能出现在那些在几种状态之间进行切换的socket上，比如ZMQ_REP。请参照zmq_socket(3)函数部分的消息模式部分以获取更多信息。
+
+　　ETERM
+
+　　　　与制定的socket相关联的context被终结了。
+
+　　ENOTSOCK
+
+　　　　制定的socket不可用。
+
+　　EINTR
+
+　　　　在接接收到消息之前，这个操作被系统信号中断了。
+
+Example
+
+　　从一个socket中接收消息
+
+char buf [256];
+nbytes = zmq_recv (socket, buf, 256, 0); assert (nbytes != -1);
+See also
+
+zmq_send(3)  zmq_getsockopt(3)  zmq_socket(7)  zmq(7)
+
+Authors
+
+This page was written by the ØMQ community. To make a change please read the ØMQ Contribution Policy at http://www.zeromq.org/docs:contributing.
+
+Web site design and content is copyright (c) 2007-2012 iMatix Corporation. Contact us for professional support. Site content licensed under the Creative Commons Attribution-Share Alike 3.0 License. ØMQ is copyright (c) Copyright (c) 2007-2012 iMatix Corporation and Contributors. ØMQ is free software licensed under the LGPL. ØMQ, ZeroMQ, and 0MQ are trademarks of iMatix Corporation. Terms of Use — Privacy
+
+Policy
