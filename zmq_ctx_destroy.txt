@@ -1,0 +1,50 @@
+zmq_ctx_destroy(3)　　　　 ØMQ Manual - ØMQ/3.2.5
+
+Name
+
+zmq_ctx_destroy - 销毁一个ZMQ环境上下文（context）
+
+Synopsis
+
+int zmq_ctx_destroy (void *context);
+Description
+
+zmq_ctx_destroy()函数会销毁ZMQ环境上下文context
+
+环境上下文将会以下面的步骤进行终结：
+
+　　● 在当前进程中，所有基于context创建的socket，若在执行阻塞操作，则会立即返回并返回错误代码ETERM。除了zmq_close()函数之外，所有在基于context创建的socket上的更深层次的操作都会失败，并返回错误代码ETERM。
+
+　　● 在中断所有的阻塞调用后，zmq_ctx_destroy()将会阻塞，直到满足以下情况：<itemizedlist> <listitem> 所有基于context创建的socket都已经被zmq_close()关闭。
+
+　　● 对于基于context创建的每一个socket，所有被应用程序调用zmq_send() 发送的消息都已经被真实的发送到了网络上，或者用ZMQ_LINGER参数设置的socket的执行周期已经期满。
+
+更多关于socket linger的行为请参见zmq_setsockopt(3)函数的ZMQ_LINGER选项。
+
+这个函数已经取代了已经不被赞成使用的函数zmq_term(3)。
+
+Return value
+
+执行成功时zmq_ctx_destroy()返回0.其它情况返回 -1，并且设置errno为下列值。
+
+Errors
+
+EFAULT
+
+　　提供的context参数不可用。
+
+EINTR
+
+　　被系统信号中断了。如果需要可以进行重启。
+
+See also
+
+zmq(7)  zmq_init(3)  zmq_close(3)  zmq_setsockopt(3)
+
+Authors
+
+This ØMQ manual page was written by Pieter Hintjens <ph@imatix.com>
+
+Web site design and content is copyright (c) 2007-2012 iMatix Corporation. Contact us for professional support. Site content licensed under the Creative Commons Attribution-Share Alike 3.0 License. ØMQ is copyright (c) Copyright (c) 2007-2012 iMatix Corporation and Contributors. ØMQ is free software licensed under the LGPL. ØMQ, ZeroMQ, and 0MQ are trademarks of iMatix Corporation. Terms of Use — Privacy
+
+Policy
