@@ -1,0 +1,76 @@
+zmq_tcp(7)          ØMQ Manual - ØMQ/4.1.0
+
+Name
+
+zmq_tcp – 使用TCP协议的ØMQ网络单播协议
+
+Synopsis
+
+TCP是一个应用广泛、可靠、单播的传输协议。当在一个网络中使用ZMQ进行分布式的应用连接时，应该优先使用TCP传输协议。
+Addressing
+
+一个ØMQ网络节点是一个字符串，格式为transport://然后紧跟着一个address。transport指明底层使用的协议。address参数指定了传输协议要连接到的地址。
+
+对于TCP传输协议来说，transport参数就是tcp，下面解释了address部分的含义。
+
+给一个socket设置一个本地地址
+
+当使用zmq_bind()函数给一个socket分配一个TCP本地地址的时候，网络节点应解释为一个接口后面加上冒号和要使用的TCP端口号。
+
+一个地址接口的可能会以下面的形式被指定：
+
+　　● 通配符*，表示所有可以使用的接口地址
+
+　　● 用数字形式表示的分配给接口的IPV4或IPV6地址
+
+　　● 被操作系统定义的可移植的接口名称
+
+TCP端口号可以被如下方式指定：
+
+　　● 在POSIX系统中，通常是1024以上的数字
+
+　　● 通配符*，表示系统分配的临时端口
+
+当使用临时端口时，调用者需要使用ZMQ_LAST_ENDPOINT属性返回实际被分配的端口号。参见zmq_getsockopt(3)函数获取更多细节。
+
+Connecting a socket
+
+当使用zmq_connect()函数以TCP方式连接一个对等的地址时，节点应当被视为对等地址后面加上冒号和TCP端口号。
+
+一个对等资质可以被下面任何一种方式指定。
+
+　　● 对等的DNS名称
+
+　　● 以数字形式表示的IPV4或者IPV6形式的地址
+
+注意：ZeroMQ Message Transport Protocol (ZMTP)使用的TCP描述文档是http://rfc.zeromq.org/spec:15
+
+Examples
+
+　　给socket分配一个本地地址
+//  TCP port 5555 on all available interfaces
+rc = zmq_bind(socket, "tcp:/// :5555");
+assert (rc == 0);
+//  TCP port 5555 on the local loop-back interface on all platforms
+rc = zmq_bind(socket, "tcp://127.0.0.1:5555");
+assert (rc == 0);
+//  TCP port 5555 on the first Ethernet network interface on Linux
+rc = zmq_bind(socket, "tcp://eth0:5555"); assert (rc == 0);
+
+　　连接一个socket
+//  Connecting using an IP address
+rc = zmq_connect(socket, "tcp://192.168.1.1:5555");
+assert (rc == 0);
+//  Connecting using a DNS name
+rc = zmq_connect(socket, "tcp://server1:5555"); assert (rc == 0);
+See also
+
+zmq_bind(3)  zmq_connect(3)  zmq_pgm(7)  zmq_ipc(7)  zmq_inproc(7)  zmq(7)
+
+Authors
+
+This page was written by the ØMQ community. To make a change please read the ØMQ Contribution Policy at http://www.zeromq.org/docs:contributing.
+
+Web site design and content is copyright (c) 2007-2012 iMatix Corporation. Contact us for professional support. Site content licensed under the Creative Commons Attribution-Share Alike 3.0 License. ØMQ is copyright (c) Copyright (c) 2007-2012 iMatix Corporation and Contributors. ØMQ is free software licensed under the LGPL. ØMQ, ZeroMQ, and 0MQ are trademarks of iMatix Corporation. Terms of Use — Privacy
+
+Policy
