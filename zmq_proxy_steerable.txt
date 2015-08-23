@@ -1,0 +1,67 @@
+zmq_proxy_steerable(3)      ØMQ Manual - ØMQ/4.1.0
+
+Name
+
+zmq_proxy_steerable – 以STOP/RESUME/TERMINATE控制方式开启内置的ZMQ代理
+
+Synopsis
+
+int zmq_proxy_steerable (const void *frontend, const void *backend, const void *capture, const void *control);
+Description
+
+zmq_proxy_steerable()函数会在当前的应用线程中开启ZMQ内置的代理，就和zmq_proxy()一样。请草考这个函数的一般描述和使用。我们只在这里只讨论新增加的第四个参数“control”。如果控制socket不为NULL，这个代理支持后续的控制操作。如果这个socket接收到SUSPEND\0消息，此代理将延迟它的活动。如果接到了RESUME\0消息，它将继续工作。如果收到了TERMINATE\0消息，它将平滑的（smoothly）结束。在刚开始的是，它将以和zmq_proxy一样的方式工作。
+
+如果控制socket为NULL，此函数和zmq_proxy的工作方式一样。
+
+参见zmq_socket(3)函数获取可用socket类型的描述。zmq_proxy(3)章节获取对zmq_proxy的描述。
+
+Example usage
+
+参见 zmq_proxy
+
+Return value
+
+当控制socket接收到TERMINATE时zmq_proxy_steerable()函数返回0,。否则，返回 -1，并且设置errno为ETERM（ZMQ context被终结了，或者指定的socket呗终结了）。
+
+Example
+
+　　创建一个共享的代理队列
+//  Create frontend, backend and control sockets
+void *frontend = zmq_socket (context, ZMQ_ROUTER);
+assert (backend);
+void *backend = zmq_socket (context, ZMQ_DEALER);
+assert (frontend);
+void *control = zmq_socket (context, ZMQ_SUB);
+assert (control);
+//  Bind sockets to TCP ports
+assert (zmq_bind (frontend, "tcp://*:5555") == 0);
+assert (zmq_bind (backend, "tcp://*:5556") == 0);
+assert (zmq_connect (control, "tcp://*:5557") == 0);
+// Subscribe to the control socket since we have chosen SUB here
+assert (zmq_setsockopt (control, ZMQ_SUBSCRIBE, "", 0));
+//  Start the queue proxy, which runs until ETERM or "TERMINATE" received on the control socket zmq_proxy (frontend, backend, NULL, control);
+
+
+　　在另一个节点上创建一个控制器，进程或者其它
+void *control = zmq_socket (context, ZMQ_PUB);
+assert (control);
+assert (zmq_bind (control, "tcp://*:5557") == 0);
+// stop the proxy 
+assert (zmq_send (control, "STOP", 5, 0) == 0);
+// resume the proxy
+assert (zmq_send (control, "RESUME", 7, 0) == 0);
+// terminate the proxy
+assert (zmq_send (control, "TERMINATE", 10, 0) == 0);
+
+
+See also
+
+zmq_proxy(3)  zmq_bind(3)  zmq_connect(3)  zmq_socket(3)  zmq(7)
+
+Authors
+
+This page was written by the ØMQ community. To make a change please read the ØMQ Contribution Policy at http://www.zeromq.org/docs:contributing.
+
+Web site design and content is copyright (c) 2007-2012 iMatix Corporation. Contact us for professional support. Site content licensed under the Creative Commons Attribution-Share Alike 3.0 License. ØMQ is copyright (c) Copyright (c) 2007-2012 iMatix Corporation and Contributors. ØMQ is free software licensed under the LGPL. ØMQ, ZeroMQ, and 0MQ are trademarks of iMatix Corporation. Terms of Use — Privacy
+
+Policy
