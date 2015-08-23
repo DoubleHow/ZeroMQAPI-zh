@@ -1,0 +1,38 @@
+zmq_init(3) 　　　　ØMQ Manual - ØMQ/3.2.5
+
+Name
+
+zmq_init - 初始化ZMQ环境上下文
+
+Synopsis
+
+void *zmq_init (int io_threads);
+Description
+
+zmq_init()函数初始化一个ZMQ环境上下文（context）。
+
+io_threads参数指定这个ZMQ环境上下文中进行I/O操作的线程池的大小。如果你的应用程序只使用inproc方式进行消息传输，你可以把这个参数设置为0，否则至少设置为1。
+
+Thread safety
+
+ZMQ环境上下文是线程安全的，可以按需要设置尽可能多的被共享，而不需要在调用端进行加锁。
+
+这个函数已经被弃用，而被zmq_ctx_new(3)取代。
+
+Return value
+
+函数zmq_init()执行成功返回一个不透明的context句柄。否则返回NULL并且设置errno为下列指定的值。
+
+Errors
+　　EINVAL
+　　　　io_threads参数指定的值不可用。
+
+See also
+zmq(7)  zmq_term(3)
+
+Authors
+
+This ØMQ manual page was written by Martin Sustrik <sustrik@250bpm.com> and Martin Lucina <mato@kotelna.sk>.
+Web site design and content is copyright (c) 2007-2012 iMatix Corporation. Contact us for professional support. Site content licensed under the Creative Commons Attribution-Share Alike 3.0 License. ØMQ is copyright (c) Copyright (c) 2007-2012 iMatix Corporation and Contributors. ØMQ is free software licensed under the LGPL. ØMQ, ZeroMQ, and 0MQ are trademarks of iMatix Corporation. Terms of Use — Privacy
+
+Policy
