@@ -1,0 +1,468 @@
+zmq_socket(3)            ØMQ Manual - ØMQ/4.0
+
+Name
+
+zmq_socket – 创建ZMQ套接字
+
+Synopsis
+
+void *zmq_socket (void *context, int type);
+Description
+
+函数zmq_socket()根据context参数创建一个ZMQ套接字（socket），并且以一个不透明指针的形式返回这新创建的socket。type参数指明了要创建的socket的类型，这个类型决定了在进行传输时在此socket上执行的语义。
+
+新创建的socket初始值是未绑定的，并且未和任何终结点相联系。为了能够在一个socket上建立消息，必须先要使用zmq_connect(3)连接上一个终结点，或者至少有使用zmq_bind(3)函数绑定一个终结点来接收传入的消息。
+
+　　与传统套接字不同的关键
+
+一般说来，传统的套接字提出了一种同步接口，无论是面向连接的可靠字节流（SOCK_STREAM），还是无连接的不可靠数据报（SOCK_DGRAM）。比较而言，ZMQ套接字提出了一种异步消息队列的抽象机制，基于socket类型的精确的队列语义。传统的套接字传输字节流或者离散的数据报，ZMQ套接字传输离散的消息。
+
+ZMWQ套接字使用了异步机制，意思是说按照时间对实体的连接和断开、重连和有效的传输对用户来说是透明的，是由ZMQ自己进行控制的。进一步，消息可能被添加到无法到达的目的端上。
+
+传统的套接字值允许严格的一对一（两个对端）、多对一（多个客户端，一个服务端），或者有些时候的一对多（多播）。在ZMQ中，出了ZMQ_PAIR类型的套接字，ZMQ允许使用zmq_connect()函数链接到多个终结点，而同时还可以在使用zmq_bind()函数绑定的终结点上接收多个终结点发来的消息，这就允许多对多的传输关系。
+
+　　线程安全
+
+ZMQ不是线程安全的。应用进程不能在多个线程间使用同一个套接字，除非已经将一个套接字的内存空间从一个线程完全的迁移到另一个线程中。
+
+　　套接字类型
+
+接下来的章节讨论ZMQ定义的套接字类型，以普通的消息模式进行分组，消息模式和套接字类型是相联系的。
+
+请求-回复模式
+
+请求-恢复模式用来从ZMQ_REQ客户端向一个或多个ZMQ_REP服务端发送请求，并且接收随后到来的对每一个发送端的恢复。
+
+ZMQ_REQ
+
+ZMQ_REQ类型的套接字用来从一个客户端向一个服务端发送请求，并从这个服务端获取回复。这类套接字值允许一种交替的执行顺序：zmq_send(请求)和随后到来的zmq_recv(回复)调用。每一个发送出去的请求都会在所有的服务端循环，并且每一个收到的消息都会与自后发出的相匹配。
+
+当一个ZMQ_REQ套接字由于对所有的服务端都达到高水位而进入静默状态，或者如果没有可用的服务端，之后在设个套接字上的所有的zmq_send(3)操作都会进入阻塞状态，直到静默状态结束或者至少有一个可以的服务端变得可用；消息在此期间不会丢失。
+
+ZMQ_REQ特征摘要
+
+兼容的对端套接字
+
+ZMQ_REP, ZMQ_ROUTER
+
+消息方向
+
+双向
+
+发送/接收模式
+
+发送，接收，发送，接收……
+
+流出路由策略
+
+循环
+
+流入路由策略
+
+最后一次的对端
+
+静默状态时的动作
+
+阻塞
+
+ZMQ_REP
+
+ZMQ_REP类型的套接字被服务端用来接收户端的请求并进行回复。这个套接字类型只允许按顺序交替进行zmq_recv(请求)和随后的zmq_send(回复)调用。每次的请求都会在所有的客户端中间进行公平的派对，并且每次的回复都会被路由给最后一次对应的客户端。如果原客户端不存在可，这个回复事件会被静默的丢弃。
+
+当一个ZMQ_REP套接字由于接受了太多而到达高水位并进入了静默状态，所有被发送的回复，如果对端的客户端出现了问题，将会被释放掉，直到静默状态结束。
+
+ZMQ_REP特征摘要
+
+兼容的对端套接字
+
+ZMQ_REQ, ZMQ_DEALER
+
+消息方向
+
+双向
+
+发送/接收模式
+
+接收，发送，接收，发送……
+
+流出路由策略
+
+最后一次的对端
+
+流入路由策略
+
+公平排队
+
+静默状态时的动作
+
+释放
+
+ZMQ_DEALER
+
+ZMQ_DEALER套接字是请求/回复模式的升级。所有被发送的消息都会在所有被连接的对端进行循环，并且从所连接的对端中接收到的每一个消息都会进行平等的排队。
+
+当一个ZMQ_DEALER套接字由于对所有对端都到达高水位而进入了静默模式，或者没有可用的对端，此时在这个套接字上的所有zmq_send(3)操作都会进入阻塞，直到静默模式终止或者至少有一个对端变得可用；此期间不会有消息丢失。
+
+当一个ZMQ_DEALER套接字连通到一个ZMQ_REP套接字上的时候，每一个发出的消息必须包含一个空消息，作为一个界定符，后面跟着一个或多个消息体。
+
+弃用的别名：ZMQ_XREQ。
+
+ZMQ_DEALER特征摘要
+
+兼容的对端套接字
+
+ZMQ_ROUTER, ZMQ_REP, ZMQ_DEALER
+
+消息方向
+
+双向
+
+发送/接收模式
+
+无限制
+
+流出路由策略
+
+循环
+
+流入路由策略
+
+平等排队
+
+静默状态时的动作
+
+阻塞
+
+ZMQ_ROUTER
+
+ZMQ_ROUTER类型的套接字是请求/回复模式的一种升级。当ZMQ_ROUTER收到一个消息的时候，在向应用进程转发之前，会拿掉消息中的第一帧，这个帧中包含着这个消息来源端的唯一身份地址。从所有的链接上来的对端中接收的消息都是平等排队的。当发送一个消息的时候，ZMQ_ROUTER会移除消息中的第一帧，并且把这个帧作为接下来要路由到的目的地址的唯一标识符。如果消息的目的地址指向的对端不再存在了，这个消息就会被丢弃，除非消息属性ZMQ_ROUTER_BEHAVIOR（新版本的ZMQ源代码ChangeLog文件中注明，Renamed ZMQ_ROUTER_BEHAVIOR to ZMQ_ROUTER_MANDATORY）被设置为1。
+
+当ZMQ_ROUTER套接字由于所有的对端到达高水位而进入静默模式的时候，所有发送到这个套接字的消息都会被丢弃，直到静默模式结束。同样的，路由向任何对端的消息，如果此时这个对端已经到达高水位，这些消息也会被丢弃。
+
+当一个ZMQ_ROUTER套接字连接到另一个ZMQ_ROUTER套接字的时候，在每一个接收到的消息中，除了消息源端的身份ID（及上文的唯一身份地址），还需要包含一个空的消息帧作为界定符。因此，应用进程看到的整个的消息结构就是：一个或多个身份ID帧，空白帧，一个或多个消息实体帧。当向一个ZMQ_REQ套接字发送回复的时候，应用程序必须包含这个空白帧。
+
+弃用的别名：ZMQ_XREP
+
+ZMQ_ROUTER特征摘要
+
+兼容的对端套接字
+
+ZMQ_DEALER, ZMQ_REQ, ZMQ_ROUTER
+
+消息方向
+
+双向
+
+发送/接收模式
+
+无限制
+
+流出路由策略
+
+视文本而定
+
+流入路由策略
+
+公平排队
+
+静默状态时的动作
+
+丢弃
+
+发布-订阅模式
+
+发布-订阅模式用于一对多模式中从一个发布者发出的消息以扇出的方式向多个订阅者分发。
+
+ZMQ_PUB
+
+ZMQ_PUB套接字用来使发布者分发数据。消息会以扇出的方式被发送到所有连接上来的对端上。zmq_recv(3)函数不能在这个类型的套接字上使用。
+
+由于一个订阅者到达了高水位而使ZMQ_PUB套接字进入静默模式的时候，所有发送到这个有问题的订阅者的消息都会被丢弃，直到静默模式终止。对于这个类型的套接字，zmq_send()函数永远不会阻塞。
+
+ZMQ_PUB特征摘要
+
+兼容的对端套接字
+
+ZMQ_SUB， ZMQ_XSUB
+
+消息方向
+
+单向的
+
+发送/接收模式
+
+只发送
+
+流出路由策略
+
+扇出（成扇形发出）
+
+流入路由策略
+
+N/A（不适用）
+
+静默状态时的动作
+
+丢弃
+
+ZMQ_SUB
+
+ZMQ_SUB类型的套接字用来订阅发布者分发下来的数据。刚初始化的ZMQ_SUB套接字是无法订阅任何消息的，适用zmq_setsockopt(3)函数的ZMQ_SUBSCRIBE属性来指定要订阅哪种消息。zmq_send()函数无法在这个类型的套接字上使用。
+
+ZMQ_SUB特征摘要
+
+兼容的对端套接字
+
+ZMQ_PUB,，ZMQ_XPUB
+
+消息方向
+
+单向的
+
+发送/接收模式
+
+只接收
+
+流出路由策略
+
+平等排队
+
+流入路由策略
+
+N/A（不适用）
+
+静默状态时的动作
+
+丢弃
+
+ZMQ_XPUB
+
+和ZMQ_PUB类型一样，但是可以接收对端发来的订阅消息。订阅消息是一个值为1的字节（表示订阅）或者值为0的字节（表示不订阅），后面跟着消息体。
+
+ZMQ_XPUB特征摘要
+
+兼容的对端套接字
+
+ZMQ_SUB, ZMQ_XSUB
+
+消息方向
+
+单向的
+
+发送/接收模式
+
+发送消息，接收订阅
+
+流出路由策略
+
+扇出
+
+流入路由策略
+
+N/A（不适用）
+
+静默状态时的动作
+
+丢弃
+
+ZMQ_XSUB
+
+和ZMQ_SUB类型的套接字一样，但是可以向套接字发送订阅消息。订阅消息是一个值为1的字节（表示订阅）或者值为0的字节（表示不订阅），后面跟着消息体。
+
+ZMQ_XSUB特征摘要
+
+兼容的对端套接字
+
+ZMQ_PUB,，ZMQ_XPUB
+
+消息方向
+
+单向的
+
+发送/接收模式
+
+接收消息，发送订阅
+
+流出路由策略
+
+N/A
+
+流入路由策略
+
+平等排队
+
+静默状态时的动作
+
+丢弃
+
+管道模式
+
+管道模式用来向排列在一个管道上的节点分发数据。数据总是顺着管道的走向，而且管道的每一阶段都至少要连接在一个节点上。当一个管道阶段连接在多个节点上时，数据会在所有相连的节点上循环。
+
+ZMQ_PUSH
+
+ZMQ_PUSH类型的套接字被一个管道节点用来向管道的下游发送消息。消息向下游所有连接的节点循环。zmq_recv()函数在这个类型的套接字上不能使用。
+
+当一个ZMQ_PUSH套接字在所有的管道下游节点上都到达高水位的时候，或者没有下游节点的时候，会进入静默模式，此时在这个套接字上的所有zmq_send(3)操作都会进入阻塞，直到静默模式结束或者在下游出现至少一个可用的节点；消息不会被丢弃。
+
+ZMQ_PUSH特征摘要
+
+兼容的对端套接字
+
+ZMQ_PULL
+
+消息方向
+
+单向的
+
+发送/接收模式
+
+只发送
+
+流出路由策略
+
+循环
+
+流入路由策略
+
+N/A
+
+静默状态时的动作
+
+阻塞
+
+ZMQ_PULL
+
+ZMQ_PULL类型的套接字用来从管道的上游节点中接收消息。在所有连接的上游节点中，消息是平等排队的。zmq_send()函数在这类套接字上无法使用。
+
+ZMQ_PULL特征摘要
+
+兼容的对端套接字
+
+ZMQ_PUSH
+
+消息方向
+
+单向的
+
+发送/接收模式
+
+只接收
+
+流出路由策略
+
+N/A
+
+流入路由策略
+
+平等排队
+
+静默状态时的动作
+
+阻塞
+
+独立对模式
+
+独立对模式用来精确的连接另一个对端。这种模式通过inproc方式用来进程内部通信。
+
+ZMQ_PAIR
+
+ZMQ_PAIR类型的套接字在每一时刻只能链接到一个对端上。不会有消息被路由或者过滤的操发生在发送给ZMQ_PAIR套接字的的消息上。
+
+当ZMQ_PAIR类型的套接字由于连接的对端到达高水位而进入静默状态，或者没有可用的对端可以连接，在这个套戒指上的所有zmq_send(3)操作都会进入阻塞，直到本套接字可以发送消息为止；消息不会被丢弃。
+
+ZMQ_PAIR类型的套接字被设计用来在线程间进行传输，采用zmq_inproc(7)方式；并且不支持诸如自动重连的功能。ZMQ_PAIR套接字是经过深思熟虑和实验的，但可能会有遗漏或者破碎的方面。
+ZMQ_PAIR特征摘要
+
+兼容的对端套接字
+
+ZMQ_PAIR
+
+消息方向
+
+双向的
+
+发送/接收模式
+
+无限制
+
+流出路由策略
+
+N/A
+
+流入路由策略
+
+N/A
+
+静默状态时的动作
+
+阻塞
+
+Return value
+
+当zmq_socket()函数运行成功的时候会返回新创建的套接字句柄。否则，函数返回NULL并且设置errno的值为下面定义的值。
+
+Errors
+
+　　EINVAL
+
+　　　　请求的套接字类型不可用。
+
+　　EFAULT
+
+　　　　参数提供的context不可用。
+
+　　EMFILE
+
+　　　　已经到达ZMQ context允许打开的套接字数量的上限。
+
+　　ETERM
+
+　　　　参数指定的context已经被终结了。
+Example
+　　使用zmq_stream创建一个简单的http服务器
+　　
+void *ctx = zmq_ctx_new ();
+assert (ctx);
+/* Create ZMQ_STREAM socket */
+void *socket = zmq_socket (ctx, ZMQ_STREAM);
+assert (socket);
+int rc = zmq_bind (socket, "tcp://*:8080");
+assert (rc == 0);
+/* Data structure to hold the ZMQ_STREAM ID */
+uint8_t id [256];
+size_t id_size = 256;
+while (1) {
+    /* Get HTTP request; ID frame and then request */
+    id_size = zmq_recv (socket, id, 256, 0);
+    assert (id_size > 0);
+    /* Prepares the response */
+    char http_response [] = 
+    "HTTP/1.0 200 OK\r\n" 
+    "Content-Type: text/plain\r\n"
+    "\r\n"
+    "Hello, World!";
+    /* Sends the ID frame followed by the response */
+    zmq_send (socket, id, id_size, ZMQ_SNDMORE);
+    zmq_send (socket, http_response, strlen (http_response), ZMQ_SNDMORE);
+    /* Closes the connection by sending the ID frame followed by a zero response */
+    zmq_send (socket, id, id_size, ZMQ_SNDMORE);
+    zmq_send (socket, 0, 0, ZMQ_SNDMORE);
+    /* NOTE: If we don't use ZMQ_SNDMORE, then we won't be able to send more */
+    /* message to any client */
+}
+zmq_close (socket); 
+zmq_ctx_destroy (ctx);
+
+
+See also
+
+zmq_init(3)  zmq_setsockopt(3)  zmq_bind(3)  zmq_connect(3)  zmq_send(3)  zmq_recv(3)  zmq_inproc(7)  zmq(7)
+
+Authors
+
+This ØMQ manual page was written by Martin Sustrik <sustrik@250bpm.com>, Martin Lucina <mato@kotelna.sk>, and Pieter Hintjens <ph@imatix.com>.
+
+Web site design and content is copyright (c) 2007-2012 iMatix Corporation. Contact us for professional support. Site content licensed under the Creative Commons Attribution-Share Alike 3.0 License. ØMQ is copyright (c) Copyright (c) 2007-2012 iMatix Corporation and Contributors. ØMQ is free software licensed under the LGPL. ØMQ, ZeroMQ, and 0MQ are trademarks of iMatix Corporation. Terms of Use — Privacy
+
+Policy
