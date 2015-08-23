@@ -1,0 +1,38 @@
+zmq_msg_copy(3)   ØMQ Manual - ØMQ/3.2.5
+
+Name
+
+zmq_msg_copy - 把一个消息的内容复制到另一个消息中
+
+Synopsis
+
+int zmq_msg_copy (zmq_msg_t *dest, zmq_msg_t *src);
+Description
+
+zmq_msg_copy()函数会将src指定的消息对象中的内容复制到dest指定的消息对象中。如果dest中有数据的话，原数据将被释放。
+
+函数在实现上并不会真的去进行数据复制，而是优先进行src和dest之间共享存储空间。应该避免在使用zmq_msg_copy()函数复制一个消息后又对其内容进行修改，这样做会引发未知的错误。如果你真的想实现硬复制，分配一个新消息并用zmq_msg_init_size()函数申请一个新的消息并用memcpy()复制其内容。
+
+永远不要直接对zmq_msg_t对象进行直接操作，而是要使用zmq_msg函数族进行操作。
+
+Return value
+
+如果zmq_msg_move()函数执行成功返回0。否则返回 -1，并且设置errno的值为下列定义的值。
+
+Errors
+
+　　EFAULT
+
+　　　　消息不可用。
+
+See also
+
+zmq_msg_move(3)  zmq_msg_init(3)  zmq_msg_init_size(3)  zmq_msg_init_data(3)  zmq_msg_close(3)  zmq(7)
+
+Authors
+
+This ØMQ manual page was written by Martin Sustrik <sustrik@250bpm.com> and Martin Lucina <mato@kotelna.sk>.
+
+Web site design and content is copyright (c) 2007-2012 iMatix Corporation. Contact us for professional support. Site content licensed under the Creative Commons Attribution-Share Alike 3.0 License. ØMQ is copyright (c) Copyright (c) 2007-2012 iMatix Corporation and Contributors. ØMQ is free software licensed under the LGPL. ØMQ, ZeroMQ, and 0MQ are trademarks of iMatix Corporation. Terms of Use — Privacy
+
+Policy
