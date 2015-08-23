@@ -1,0 +1,37 @@
+zmq_close(3) 　　　　　　ØMQ Manual - ØMQ/3.2.5
+
+Name
+
+zmq_close - 关闭ZMQ socket
+
+Synopsis
+
+int zmq_close (void *socket);
+Description
+
+zmq_close()函数会销毁由socket参数指定的socket。任何从网络上接收了但没有被应用程序使用zmq_recv()接收的消息都将会被丢弃。已经使用zmq_send() 发送的消息，但是还没有被设备发送到网络中的消息的处理方式，将由socket的 ZMQ_LINGER 值决定。
+
+默认的ZMQ_LINGER值通常是不会丢弃没有发送的消息；这样的话，当调用zmq_term()函数时可能会导致应用程序阻塞。更多细节请参见zmq_setsockopt(3) 和zmq_term(3)。
+Return value
+
+如果执行成功，zmq_close()函数会返回0。其它情况则返回-1，并且设置errno为下列值。
+
+Errors
+
+ENOTSOCK
+
+　　所提供的socket无法使用。
+
+See also
+
+zmq_socket(3)  zmq_term(3)  zmq_setsockopt(3)  zmq(7)
+
+Authors
+
+This ØMQ manual page was written by Martin Sustrik <sustrik@250bpm.com> and Martin Lucina
+
+<mato@kotelna.sk>.
+
+Web site design and content is copyright (c) 2007-2012 iMatix Corporation. Contact us for professional support. Site content licensed under the Creative Commons Attribution-Share Alike 3.0 License. ØMQ is copyright (c) Copyright (c) 2007-2012 iMatix Corporation and Contributors. ØMQ is free software licensed under the LGPL. ØMQ, ZeroMQ, and 0MQ are trademarks of iMatix Corporation. Terms of Use — Privacy
+
+Policy
