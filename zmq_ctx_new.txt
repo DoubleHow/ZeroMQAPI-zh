@@ -1,0 +1,38 @@
+zmq_ctx_new(3)               ØMQ Manual - ØMQ/3.2.5
+
+Name
+
+zmq_ctx_new – 创建一个新的ZMQ 环境上下文
+
+Synopsis
+
+void *zmq_ctx_new ();
+Description
+
+zmq_ctx_new()函数创建一个新的ZMQ 环境上下文。
+
+本函数取代了已经不再被赞成使用的函数 zmq_init(3)。
+
+Thread safety
+
+ZMQ 环境上下文是是线程安全的，你可以按需要尽可能多的被应用线程共享使用，而不需要在调用端添加线程锁。
+
+Return value
+
+如果zmq_ctx_new() 执行成功，则会返回一个新创建的context句柄。否则此函数将会返回NULL并设置errno为下列定义的值。
+
+Errors
+
+此函数没有定义任何错误代码。
+
+See also
+
+zmq(7)  zmq_ctx_set(3)  zmq_ctx_get(3)  zmq_ctx_destroy(3)
+
+Authors
+
+This ØMQ manual page was written by Pieter Hintjens ph@imatix.com
+
+Web site design and content is copyright (c) 2007-2012 iMatix Corporation. Contact us for professional support. Site content licensed under the Creative Commons Attribution-Share Alike 3.0 License. ØMQ is copyright (c) Copyright (c) 2007-2012 iMatix Corporation and Contributors. ØMQ is free software licensed under the LGPL. ØMQ, ZeroMQ, and 0MQ are trademarks of iMatix Corporation. Terms of Use — Privacy
+
+Policy
