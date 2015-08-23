@@ -67,25 +67,16 @@ EMTHREAD
 
 Example
 
-复制代码
- 1 /* Create a ZMQ_SUB socket */
- 2 
- 3 void *socket = zmq_socket (context, ZMQ_SUB);
- 4 
- 5 assert (socket);
- 6 
- 7 /* Connect it to an in-process transport with the address 'my_publisher
- 8 
- 9 int rc = zmq_connect (socket, "inproc://my_publisher");
-10 
-11 assert (rc == 0);
-12 
-13 /* Connect it to the host server001, port 5555 using a TCP transport */
-14 
-15 rc = zmq_connect (socket, "tcp://server001:5555"); assert (rc == 0);
-复制代码
-See also
+/* Create a ZMQ_SUB socket */
+void *socket = zmq_socket (context, ZMQ_SUB);
+assert (socket);
+/* Connect it to an in-process transport with the address 'my_publisher
+int rc = zmq_connect (socket, "inproc://my_publisher");
+assert (rc == 0);
+/* Connect it to the host server001, port 5555 using a TCP transport */
+rc = zmq_connect (socket, "tcp://server001:5555"); assert (rc == 0);
 
+See also
 zmq_bind(3)  zmq_socket(3)  zmq(7)
 
 Authors
