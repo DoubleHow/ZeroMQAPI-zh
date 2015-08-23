@@ -1,0 +1,43 @@
+zmq_curve_keypair(3) 　　　　ØMQ Manual - ØMQ/4.1.0
+
+Name
+
+zmq_curve_keypair - 生成一个新的CURVE 密钥对
+
+Synopsis
+
+int zmq_curve_keypair (char *z85_public_key, char *z85_secret_key);
+Description
+
+函数zmq_curve_keypair()会返回一个随机生成的密钥对，包括一个公钥和一个密钥。调用者提供两个存储空间，每个长度至少是8 bit * 41大，用来存储生成的密钥对。这两个密钥都是经过zmq_z85_encode(3)生成的。
+
+Return value
+
+函数zmq_curve_keypair()执行成功会返回0，否则会返回 -1，并且设置errno为下列值。
+
+Errors
+
+　　ENOTSUP
+
+　　　　此版本的ZMQ链接库libzmq 不支持加密（libsodium）。
+
+Example
+
+　　创建一对新的curve密钥对
+
+char public_key [41];
+char secret_key [41];
+int rc = crypto_box_keypair (public_key, secret_key); assert (rc == 0);
+See also
+
+zmq_z85_decode(3) 　　zmq_z85_encode(3) 　　zmq_curve(7)
+
+Authors
+
+This page was written by the ØMQ community. To make a change please read the ØMQ Contribution Policy at http://www.zeromq.org/docs:contributing.
+
+ 
+
+Web site design and content is copyright (c) 2007-2012 iMatix Corporation. Contact us for professional support. Site content licensed under the Creative Commons Attribution-Share Alike 3.0 License. ØMQ is copyright (c) Copyright (c) 2007-2012 iMatix Corporation and Contributors. ØMQ is free software licensed under the LGPL. ØMQ, ZeroMQ, and 0MQ are trademarks of iMatix Corporation. Terms of Use — Privacy
+
+Policy
