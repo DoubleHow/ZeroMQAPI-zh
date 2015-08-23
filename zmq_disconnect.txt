@@ -1,0 +1,65 @@
+zmq_disconnect(3) 　　　　ØMQ Manual - ØMQ/3.2.5
+
+Name
+
+zmq_disconnect - 断开一个socket的连接
+
+Synopsis
+
+int zmq_disconnect (void *socket, const char *endpoint);
+Description
+
+函数zmq_disconnect() 会断开socket参数指定的socket与endpoint参数指定的终结点的连接。
+
+endpoint参数和在zmq_connect(3)函数中有详细描述。
+
+Return value
+
+如果zmq_disconnect()函数执行成功，则返回0。否则返回 -1，并设置errno为下列指定值。
+
+Errors
+
+　　EINVAL
+
+　　　　参数endpoint指定的终结点不可用。
+
+　　ETERM　
+
+　　　　和当前soocket相联系的context被终结了。
+
+　　ENOTSOCK
+
+　　　　参数socket不可用。
+
+　　ENOENT
+
+　　　　socket并没有连接参数endpoint的终结点。
+
+Example
+
+用一个scoket连接广播、进程内和TCP连接。
+
+/* Create a ZMQ_SUB socket */
+void *socket = zmq_socket (context, ZMQ_SUB);
+assert (socket);
+/* Connect it to the host server001, port 5555 using a TCP transport */
+rc = zmq_connect (socket, "tcp://server001:5555");
+assert (rc == 0);
+/* Disconnect from the previously connected endpoint */
+rc = zmq_disconnect (socket, "tcp://server001:5555"); assert (rc == 0);
+
+See also
+
+zmq_connect(3)  zmq_socket(3)  zmq(7)
+
+Authors
+
+This ØMQ manual page was written by Martin Sustrik <sustrik@250bpm.com>, Martin Lucina
+
+<mato@kotelna.sk> and Ian Barber <ian.barber@gmail.com>
+
+ 
+
+Web site design and content is copyright (c) 2007-2012 iMatix Corporation. Contact us for professional support. Site content licensed under the Creative Commons Attribution-Share Alike 3.0 License. ØMQ is copyright (c) Copyright (c) 2007-2012 iMatix Corporation and Contributors. ØMQ is free software licensed under the LGPL. ØMQ, ZeroMQ, and 0MQ are trademarks of iMatix Corporation. Terms of Use — Privacy
+
+Policy
