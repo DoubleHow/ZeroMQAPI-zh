@@ -1,0 +1,50 @@
+zmq_ctx_term(3) ØMQ Manual - ØMQ/4.1.0
+
+Name
+
+zmq_ctx_term - 终结一个ZMQ环境上下文
+
+Synopsis
+
+int zmq_ctx_term (void *context);
+Description
+
+函数 zmq_ctx_term() 会销毁ZMQ环境上下文context。
+
+环境上下文的终止过程会按下列步骤进行：
+
+● 当在前进程中，对基于context创建的socket的任何阻塞调用都会立刻返回并返回错误代码ETERM。除 zmq_close()外，所有对基于context的更深层次的操作都会失败并返回错误代码ETERM。
+
+● 中断所有的阻塞调用后，zmq_ctx_term() 函数会进入阻塞状态，直到满足下列条件：<无序列表> <列表项> 所有基于context创建的scoekt都已经被zmq_close()函数关闭。
+
+● 对context上的每一个socket来说，所有被应用进程使用zmq_send() 发送的消息都已经被真实的发送到了网络上，或者socket使用ZMQ_LINGER 设置的超时时间已到。
+
+想要知道更多关于socket linger属性超时的细节请参见zmq_setsockopt(3)函数中ZMQ_LINGER属性。
+
+本函数取代了已经不再被赞成使用的函数 zmq_term(3)。
+
+Return value
+
+如果执行成功，函数zmq_ctx_term() 返回0。否则返回 -1，并且设置errno为下列指定值。
+
+Errors
+
+　　EFAULT
+
+　　　　给定的context参数无效。
+
+　　EINTR
+
+　　　　结束context的过程被系统信号中断。如果需要，可以重新调用此函数。
+
+See also
+
+zmq(7)  zmq_init(3)  zmq_close(3)  zmq_setsockopt(3)
+
+Authors
+
+This page was written by the ØMQ community. To make a change please read the ØMQ Contribution Policy at http://www.zeromq.org/docs:contributing.
+
+Web site design and content is copyright (c) 2007- 2012 iMatix Corporation. Contact us for professional support. Site content licensed under the Creative Commons Attribution-Share Alike 3.0 License. ØMQ is copyright (c) Copyright (c) 2007-2012 iMatix Corporation and Contributors. ØMQ is free software licensed under the LGPL. ØMQ, ZeroMQ, and 0MQ are trademarks of iMatix Corporation. Terms of Use — Privacy
+
+Policy
