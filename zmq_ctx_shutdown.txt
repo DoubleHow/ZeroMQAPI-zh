@@ -1,0 +1,38 @@
+zmq_ctx_shutdown(3) 　　　　ØMQ Manual - ØMQ/4.1.0
+
+Name
+
+zmq_ctx_shutdown - 停止一个ZMQ context
+
+Synopsis
+
+int zmq_ctx_shutdown (void *context);
+Description
+
+zmq_ctx_shutdown() 函数会停止ZMQ 环境上下文context。
+
+停止context会立刻引起当前所有基于context创建的scoket的阻塞调用返回，并使其返回错误代码ETERM。除了zmq_close() 意外，对所有基于context创建的socket进行更深入的调用都会失败并返回错误代码ETERM。
+
+这个函数是可选的，客户端仍然会调用zmq_ctx_term(3)函数释放zeromq分配的所有资源。
+
+Return value
+
+函数zmq_ctx_shutdown()调用成功会返回0。否则返回 -1，并且把errno设置为下列定义的值。
+
+Errors
+
+　　EFAULT
+
+　　　　参数提供的context无效。
+
+See also
+
+zmq(7)  zmq_init(3)  zmq_ctx_term(3)  zmq_close(3)  zmq_setsockopt(3)
+
+Authors
+
+This page was written by the ØMQ community. To make a change please read the ØMQ Contribution Policy at http://www.zeromq.org/docs:contributing.
+
+Web site design and content is copyright (c) 2007-2012 iMatix Corporation. Contact us for professional support. Site content licensed under the Creative Commons Attribution-Share Alike 3.0 License. ØMQ is copyright (c) Copyright (c) 2007-2012 iMatix Corporation and Contributors. ØMQ is free software licensed under the LGPL. ØMQ, ZeroMQ, and 0MQ are trademarks of iMatix Corporation. Terms of Use — Privacy
+
+Policy
