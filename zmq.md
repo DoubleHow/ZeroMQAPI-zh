@@ -1,15 +1,16 @@
-zmq(7)　　　　　　0MQ Manual - 0MQ/3.2.5
+#zmq(7)　　　　　　0MQ Manual - 0MQ/3.2.5
 
-Name
+#Name
 
 zmq – ØMQ 轻量级消息传输内核
 
-Synopsis
+#Synopsis
 
-#include <znq.h>
+    #include <znq.h>
 
-cc [flags] files –lzmq [libraries]
-Description
+    cc [flags] files –lzmq [libraries]
+
+#Description
 
 ØMQ轻量级消息传输内核是一个从标准socket接口的扩展而来的链接库，这些接口通常是由一些专门的传送中间设备来提供。ØMQ提供了一个步消息传送、多模式消息传送、消息过滤（订阅）、对多种传输协议无缝接入的集合。
 
