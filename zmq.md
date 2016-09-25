@@ -6,7 +6,7 @@ zmq – ØMQ 轻量级消息传输内核
 
 ##Synopsis
 
-    #include <znq.h>
+    #include <zmq.h>
 
     cc [flags] files –lzmq [libraries]
 
@@ -26,7 +26,8 @@ zmq – ØMQ 轻量级消息传输内核
 
 ● 操作context的属性
 
-    zmq_ctx_set(3) zmq_ctx_get(3)
+    zmq_ctx_set(3) 
+    zmq_ctx_get(3)
 
 ● 删除一个context
 
